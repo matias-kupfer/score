@@ -8,43 +8,63 @@
 import UIKit
 import Firebase
 import FirebaseFirestoreSwift
+import WebKit
 
 
 class HomeViewController: UIViewController {
     let db = Firestore.firestore()
     
     var games = [GameModel]()
+    var selectedGame: GameModel!
     
-    let leftBarButton: UIBarButtonItem = {
-        var button = UIBarButtonItem()
+    
+    let rightBarButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
         button.image = UIImage(systemName: "plus")
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(gameSelector(_:))
         return button
     }()
     
-    let gamePicker: UIPickerView = {
-        var picker = UIPickerView()
-        return picker
+    let leftBarButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
+        button.image = UIImage(systemName: "list.bullet")
+        button.style = UIBarButtonItem.Style.plain
+        return button
     }()
+    
+    let loader: UIActivityIndicatorView = {
+        let loader = UIActivityIndicatorView()
+        loader.startAnimating()
+        return loader
+    }()
+    
+    let selectGameButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = .yellow
+        button.setTitle("Choose game...", for: .normal)
+        return button
+    }()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        selectGameButton.showsMenuAsPrimaryAction = true
+        
+        view.addSubview(loader)
+        loader.center = self.view.center
+        
         getGames()
-                
+        
+        title = "Score"
         navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Scores"
+//        navigationItem.titleView = selectGameButton
+        leftBarButton.target = self
         navigationItem.leftBarButtonItem = leftBarButton
-        
-        gamePicker.dataSource = self
-        gamePicker.delegate = self
-        self.view.addSubview(gamePicker)
-        gamePicker.center = self.view.center
-        
-    }
-    
-    @objc func gameSelector(_: UIBarButtonItem) {
+        rightBarButton.target = self
+        navigationItem.rightBarButtonItem = rightBarButton
         
     }
     
@@ -58,30 +78,46 @@ class HomeViewController: UIViewController {
                     print("no documents")
                     return
                 }
-
                 self.games = documents.compactMap { queryDocumentSnapshot -> GameModel? in
-                    print(queryDocumentSnapshot.data())
                     return try! queryDocumentSnapshot.data(as: GameModel.self)
                 }
+                self.configureMenu()
+                self.loader.stopAnimating()
             }
         }
     }
-
-
-}
-
-extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
+    
+    private func configureMenu() {
+        self.title = self.games[0].name
+        self.navigationItem.rightBarButtonItem = rightBarButton
+        let actions: [UIAction] = games.map {
+            return UIAction(title: $0.name, image: UIImage(systemName: "plus"), handler: { (action: UIAction) in
+                self.selectGame(uiActionEvent: action)
+            })
+        }
+        let menu: UIMenu = UIMenu(title: "Menu title", subtitle: "subtitle", image: UIImage(systemName: "plus"), children: actions)
+        self.selectGameButton.menu = menu
+        self.leftBarButton.menu = menu
     }
     
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return games.count
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        let row = games[row]
-        return row.name
+    private func selectGame(uiActionEvent: UIAction) {
+        self.title = uiActionEvent.title
+        self.selectedGame = games.first(where: {$0.name == uiActionEvent.title})!
     }
 }
+
+//extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+//    func numberOfComponents(in pickerVi2ew: UIPickerView) -> Int {
+//        return 1
+//    }
+//
+//    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+//        return games.count
+//    }
+//
+//    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+//        let row = games[row]
+//        return row.name
+//    }
+//}
 
