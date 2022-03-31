@@ -22,6 +22,7 @@ class HomeViewController: UIViewController {
         let button = UIBarButtonItem()
         button.image = UIImage(systemName: "plus")
         button.style = UIBarButtonItem.Style.plain
+        button.action = #selector(HomeViewController.addGameModal(_:))
         return button
     }()
     
@@ -32,71 +33,74 @@ class HomeViewController: UIViewController {
         return button
     }()
     
-    let loader: UIActivityIndicatorView = {
+    let activityIndicator: UIActivityIndicatorView = {
         let loader = UIActivityIndicatorView()
-        loader.startAnimating()
         return loader
     }()
     
-    let selectGameButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.tintColor = .yellow
-        button.setTitle("Choose game...", for: .normal)
-        return button
+    let table: UITableView = {
+        let table = UITableView()
+        table.register(GameTableViewCell.self, forCellReuseIdentifier: GameTableViewCell.identifier)
+        return table
     }()
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        selectGameButton.showsMenuAsPrimaryAction = true
-        
-        view.addSubview(loader)
-        loader.center = self.view.center
-        
-        getGames()
-        
-        title = "Score"
         navigationController?.navigationBar.prefersLargeTitles = true
-//        navigationItem.titleView = selectGameButton
+        title = "Score"
+        //        navigationItem.titleView = selectGameButton
         leftBarButton.target = self
-        navigationItem.leftBarButtonItem = leftBarButton
         rightBarButton.target = self
         navigationItem.rightBarButtonItem = rightBarButton
         
+        activityIndicator.center = self.view.center
+        view.addSubview(activityIndicator)
+        
+        table.delegate = self
+        table.dataSource = self
+        view.addSubview(table)
+        
+        getGames()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        table.frame = view.bounds
     }
     
     private func getGames() {
+        activityIndicator.startAnimating()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: activityIndicator)
         let gamesRef = db.collection("games")
         gamesRef.getDocuments() { (querySnapshot, err) in
             if let err = err {
                 print("Error getting documents: \(err)")
             } else {
                 guard let documents = querySnapshot?.documents else {
+                    return
+                }
+                if (documents.count == 0) {
                     print("no documents")
                     return
                 }
                 self.games = documents.compactMap { queryDocumentSnapshot -> GameModel? in
                     return try! queryDocumentSnapshot.data(as: GameModel.self)
                 }
+                self.activityIndicator.stopAnimating()
+                self.navigationItem.leftBarButtonItem = self.leftBarButton
                 self.configureMenu()
-                self.loader.stopAnimating()
             }
         }
     }
     
     private func configureMenu() {
-        self.title = self.games[0].name
-        self.navigationItem.rightBarButtonItem = rightBarButton
         let actions: [UIAction] = games.map {
             return UIAction(title: $0.name, image: UIImage(systemName: "plus"), handler: { (action: UIAction) in
                 self.selectGame(uiActionEvent: action)
             })
         }
-        let menu: UIMenu = UIMenu(title: "Menu title", subtitle: "subtitle", image: UIImage(systemName: "plus"), children: actions)
-        self.selectGameButton.menu = menu
+        let menu: UIMenu = UIMenu(title: "Your games", subtitle: "choose", image: UIImage(systemName: "plus"), children: actions)
         self.leftBarButton.menu = menu
     }
     
@@ -106,18 +110,41 @@ class HomeViewController: UIViewController {
     }
 }
 
-//extension HomeViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-//    func numberOfComponents(in pickerVi2ew: UIPickerView) -> Int {
-//        return 1
-//    }
-//
-//    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-//        return games.count
-//    }
-//
-//    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-//        let row = games[row]
-//        return row.name
-//    }
-//}
+extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 20
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: GameTableViewCell.identifier, for: indexPath) as? GameTableViewCell else {
+            return UITableViewCell()
+        }
+        cell.configure()
+        
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("tapped row")
+    }
+}
 
+extension HomeViewController: AddGameViewControllerDelegate {
+    @objc private func addGameModal(_: UIBarButtonItem) {
+        let vc = AddGameViewController()
+        vc.addGameViewControllerDelegate = self
+        let nc = UINavigationController(rootViewController: vc)
+        nc.sheetPresentationController?.detents = [.medium(), .large()]
+        nc.sheetPresentationController?.prefersGrabberVisible = true
+        navigationController?.present(nc, animated: true)
+    }
+    
+    func onGameSaved() {
+        print("game saved")
+    }
+}
