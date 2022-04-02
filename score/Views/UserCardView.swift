@@ -9,10 +9,10 @@ import UIKit
 
 class UserCardView: UIView {
     
+    var users: [UserModel] = [UserModel]()
+    
     let nameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .yellow
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -23,7 +23,6 @@ class UserCardView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        nameLabel.frame = bounds
     }
     
     required init?(coder: NSCoder) {
@@ -31,8 +30,11 @@ class UserCardView: UIView {
     }
 
     public func configure(with user: UserModel) {
-        self.nameLabel.text = "@" + user.username
-        print(user)
+        users.append(user)
+        var label: UILabel = UILabel()
+        label.text = "@" + user.username
+        label.frame = bounds
+        addSubview(label)
     }
     
     

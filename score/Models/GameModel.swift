@@ -6,7 +6,17 @@
 //
 
 import Foundation
+import UIKit
 
 struct GameModel: Codable {
-    let name: String
+    var name: String
+    var users: [String]
+    var color: GameColorModel
+}
+
+struct GameColorModel: Codable {
+    var red: CGFloat
+    var blue: CGFloat
+    var green: CGFloat
+    var alpha:CGFloat
 }

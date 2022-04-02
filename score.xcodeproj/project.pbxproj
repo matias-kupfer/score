@@ -22,6 +22,7 @@
 		75B486CD27F3124C003DE9DD /* AddGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486CC27F3124C003DE9DD /* AddGameViewController.swift */; };
 		75B486CF27F5AF00003DE9DD /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486CE27F5AF00003DE9DD /* UserModel.swift */; };
 		75B486D127F5AFD8003DE9DD /* UserCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486D027F5AFD8003DE9DD /* UserCardView.swift */; };
+		75B486D327F87171003DE9DD /* GameHeaderUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486D227F87171003DE9DD /* GameHeaderUIView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		75B486CC27F3124C003DE9DD /* AddGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGameViewController.swift; sourceTree = "<group>"; };
 		75B486CE27F5AF00003DE9DD /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		75B486D027F5AFD8003DE9DD /* UserCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCardView.swift; sourceTree = "<group>"; };
+		75B486D227F87171003DE9DD /* GameHeaderUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameHeaderUIView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +92,7 @@
 		75B486B927F1D6D5003DE9DD /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				75B486CB27F31223003DE9DD /* Sub-controllers */,
+				75B486CB27F31223003DE9DD /* general */,
 				75B486A927F1D6BD003DE9DD /* ViewController.swift */,
 				75B486BB27F1D709003DE9DD /* TabBarViewController.swift */,
 				75B486BD27F1D720003DE9DD /* HomeViewController.swift */,
@@ -113,16 +115,18 @@
 			children = (
 				75B486C927F2FF89003DE9DD /* GameTableViewCell.swift */,
 				75B486D027F5AFD8003DE9DD /* UserCardView.swift */,
+				75B486D227F87171003DE9DD /* GameHeaderUIView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		75B486CB27F31223003DE9DD /* Sub-controllers */ = {
+		75B486CB27F31223003DE9DD /* general */ = {
 			isa = PBXGroup;
 			children = (
 				75B486CC27F3124C003DE9DD /* AddGameViewController.swift */,
 			);
-			path = "Sub-controllers";
+			name = general;
+			path = "generañ";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -207,6 +211,7 @@
 				75B486BC27F1D709003DE9DD /* TabBarViewController.swift in Sources */,
 				75B486AA27F1D6BD003DE9DD /* ViewController.swift in Sources */,
 				75B486A627F1D6BD003DE9DD /* AppDelegate.swift in Sources */,
+				75B486D327F87171003DE9DD /* GameHeaderUIView.swift in Sources */,
 				75B486CD27F3124C003DE9DD /* AddGameViewController.swift in Sources */,
 				75B486C227F1D754003DE9DD /* GameModel.swift in Sources */,
 				75B486A827F1D6BD003DE9DD /* SceneDelegate.swift in Sources */,

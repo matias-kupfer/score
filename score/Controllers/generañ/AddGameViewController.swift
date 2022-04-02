@@ -17,8 +17,12 @@ protocol AddGameViewControllerDelegate: AnyObject {
 class AddGameViewController: UIViewController {
     let db = Firestore.firestore()
     
+    var gameColor: GameColorModel?
+    
     public var addGameViewControllerDelegate: AddGameViewControllerDelegate!
-        
+    
+    private var users: [String] = [String]()
+    
     let userCardView: UserCardView = {
         let view = UserCardView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -29,6 +33,23 @@ class AddGameViewController: UIViewController {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    
+  
+    
+    let colorPicker: UIColorPickerViewController = {
+        let colorPicker = UIColorPickerViewController()
+        return colorPicker
+    }()
+    
+    let colorPickerButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Color", for: .normal)
+//        button.setImage(UIImage(systemName: "eyedropper"), for: .normal)
+        button.configuration = UIButton.Configuration.plain()
+        button.configuration?.buttonSize = UIButton.Configuration.Size.medium
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     let leftBarButtonItem: UIBarButtonItem = {
@@ -44,7 +65,6 @@ class AddGameViewController: UIViewController {
         var button = UIBarButtonItem()
         button.title = "Save"
         button.style = UIBarButtonItem.Style.plain
-        button.isEnabled = false
         button.action = #selector(onSaveTask(_:))
         button.tintColor = .systemBlue
         return button
@@ -111,13 +131,16 @@ class AddGameViewController: UIViewController {
         //        UserCardView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 500))
         
         usersInputField.addTarget(self, action: #selector(searchUser(_:)), for: .editingChanged)
+        colorPickerButton.addTarget(self, action: #selector(openColorPicker(_:)), for: .touchUpInside)
+        colorPicker.delegate = self
+        
         view.addSubview(formView)
         formView.addSubview(nameInputField)
         formView.addSubview(desciptionInputField)
         formView.addSubview(usersInputField)
-        
         view.addSubview(userCardView)
-
+        view.addSubview(colorPickerButton)
+        
         setUpConstraints()
     }
     
@@ -146,6 +169,9 @@ class AddGameViewController: UIViewController {
         constraints.append(userCardView.trailingAnchor.constraint(equalTo: margins.trailingAnchor))
         constraints.append(userCardView.heightAnchor.constraint(equalToConstant: 20))
         
+        constraints.append(colorPickerButton.topAnchor.constraint(equalTo: userCardView.bottomAnchor, constant: 20))
+        
+        
         NSLayoutConstraint.activate(constraints)
         
     }
@@ -165,8 +191,11 @@ class AddGameViewController: UIViewController {
                     return
                 }
                 let user: UserModel = try! documents.first!.data(as: UserModel.self)
+                if (self.users.contains(user.id)) {
+                    return
+                }
+                self.users.append(user.id)
                 self.userCardView.configure(with: user)
-//                self.view.addSubview(self.userCardView)
             }
         }
         
@@ -177,7 +206,8 @@ class AddGameViewController: UIViewController {
     }
     
     @objc private func onSaveTask(_: UIBarButtonItem) {
-        let gameObject = GameModel(name: nameInputField.text!)
+        print(users)
+        let gameObject = GameModel(name: nameInputField.text!, users: self.users, color: gameColor!)
         let gamesRef = db.collection("games")
         do {
             try gamesRef.addDocument(from: gameObject)
@@ -185,5 +215,23 @@ class AddGameViewController: UIViewController {
             print("Error writing city to Firestore: \(error)")
         }
     }
+}
+
+extension AddGameViewController: UIColorPickerViewControllerDelegate {
     
+    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+        let colorPicked: UIColor = viewController.selectedColor
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        colorPicked.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        gameColor = GameColorModel(red: red, blue: blue, green: green, alpha: alpha)
+        colorPickerButton.backgroundColor = viewController.selectedColor
+//        color = viewController.selectedColor
+    }
+    
+    @objc private func openColorPicker(_: UIButton) {
+        navigationController?.present(colorPicker, animated: true)
+    }
 }
