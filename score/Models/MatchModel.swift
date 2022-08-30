@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct MatchModel: Codable {
+    var id: String
+    var date: Double
+    var order: [String]
+}

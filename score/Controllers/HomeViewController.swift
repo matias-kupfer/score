@@ -9,6 +9,7 @@ import UIKit
 import Firebase
 import FirebaseFirestoreSwift
 import WebKit
+import Promises
 
 
 class HomeViewController: UIViewController {
@@ -16,13 +17,17 @@ class HomeViewController: UIViewController {
     
     var games = [GameModel]()
     var selectedGame: GameModel!
+    var selectedGameUsers: [UserModel] = [UserModel]()
+    var matches: [MatchModel] = [MatchModel]()
     
+    private var gameHeaderUIView: GameHeaderUIView!
     
     let rightBarButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
         button.image = UIImage(systemName: "plus")
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(HomeViewController.addGameModal(_:))
+        //                button.action = #selector(HomeViewController.addGameModal(_:))
+        button.action = #selector(HomeViewController.addMatchModal(_:))
         return button
     }()
     
@@ -40,12 +45,22 @@ class HomeViewController: UIViewController {
     
     let table: UITableView = {
         let table = UITableView()
-        table.register(GameTableViewCell.self, forCellReuseIdentifier: GameTableViewCell.identifier)
+        table.register(MatchTableViewCell.self, forCellReuseIdentifier: MatchTableViewCell.identifier)
         return table
+    }()
+    
+    let refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.translatesAutoresizingMaskIntoConstraints = false
+        return refreshControl
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl.addTarget(self, action: #selector(self.onRefresh(_:)), for: .valueChanged)
+        table.addSubview(refreshControl)
         
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Score"
@@ -55,14 +70,27 @@ class HomeViewController: UIViewController {
         navigationItem.rightBarButtonItem = rightBarButton
         
         activityIndicator.center = self.view.center
-        view.addSubview(activityIndicator)
+        //view.addSubview(activityIndicator)
         
-//        table.tableHeaderView =
+        gameHeaderUIView = GameHeaderUIView()
+        gameHeaderUIView.translatesAutoresizingMaskIntoConstraints = false
+        table.tableHeaderView = gameHeaderUIView
         table.delegate = self
         table.dataSource = self
         view.addSubview(table)
         
         getGames()
+        setUpConstraints()
+    }
+    
+    private func setUpConstraints() {
+        var constraints = [NSLayoutConstraint]()
+        let margins = view.layoutMarginsGuide
+        
+        constraints.append(gameHeaderUIView.leadingAnchor.constraint(equalTo: margins.leadingAnchor))
+        constraints.append(gameHeaderUIView.trailingAnchor.constraint(equalTo: margins.trailingAnchor))
+        
+        NSLayoutConstraint.activate(constraints)
     }
     
     override func viewDidLayoutSubviews() {
@@ -107,9 +135,69 @@ class HomeViewController: UIViewController {
     }
     
     private func selectGame(uiActionEvent: UIAction) {
-        self.title = uiActionEvent.title
-        self.selectedGame = games.first(where: {$0.name == uiActionEvent.title})!
+        title = uiActionEvent.title
+        selectedGame = games.first(where: {$0.name == uiActionEvent.title})!
+        getGameUsers()
+        getMatches()
         changeColor()
+    }
+    
+    private func getGameUsers() {
+        selectedGameUsers.removeAll()
+        // loop that waits to proceed?
+        for userId in selectedGame.users {
+            searchUser(userId: userId).then{(user: UserModel) in
+                self.selectedGameUsers.append(user)
+                self.gameHeaderUIView?.configure(game: self.selectedGame, users: self.selectedGameUsers)
+                self.table.reloadData()
+            }.catch{(err: Error) in
+                print(err)
+            }
+        }
+    }
+    
+    private func getMatches() {
+        let matchesRef = db.collection("games").document(selectedGame.id).collection("matches").order(by: "date", descending: true)
+        matchesRef.getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                guard let documents = querySnapshot?.documents else {
+                    return
+                }
+                if (documents.count == 0) {
+                    print("no documents")
+                    return
+                }
+                self.matches = documents.compactMap { queryDocumentSnapshot -> MatchModel? in
+                    return try! queryDocumentSnapshot.data(as: MatchModel.self)
+                }
+                self.table.reloadData()
+            }
+        }
+    }
+    
+    private func searchUser(userId: String) -> Promise<UserModel>{
+        let usersRef = db.collection("users").whereField("id", isEqualTo: userId).limit(to: 1)
+        let promise = Promise<UserModel> { (resolve, reject) in
+            usersRef.getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    print("Error getting documents: \(err)")
+                    return
+                } else {
+                    guard let documents: [QueryDocumentSnapshot] = querySnapshot?.documents else {
+                        reject(NSError(domain: "user not found", code: 404, userInfo: nil))
+                        return
+                    }
+                    if (documents.count == 0) {
+                        print("no documents")
+                        return
+                    }
+                    resolve(try! documents.first!.data(as: UserModel.self))
+                }
+            }
+        }
+        return promise
     }
     
     private func changeColor() {
@@ -123,41 +211,60 @@ class HomeViewController: UIViewController {
 extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 20
+        return 1
     }
     
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: GameTableViewCell.identifier, for: indexPath) as? GameTableViewCell else {
-            return UITableViewCell()
-        }
-        cell.configure()
-        
-        return cell
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let sectionHeaderUIView = SectionHeaderUIView()
+        sectionHeaderUIView.delegate = self
+        sectionHeaderUIView.configure(m: matches[section], game: selectedGame)
+        return sectionHeaderUIView
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("tapped row")
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return matches.count
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 40
     }
     
-    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        guard let header = view as? UITableViewHeaderFooterView else {return}
-        header.textLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        header.textLabel?.frame = CGRect(x: header.bounds.origin.x + 20, y: header.bounds.origin.y, width: 100, height: header.bounds.height)
-        header.textLabel?.textColor = .white
-        header.textLabel?.text = "exmaple"
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let myTimeInterval = TimeInterval(matches[section].date)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd-MM-yyyy"
+        return formatter.string(from: NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date)
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "jkldhfjksdhjk"
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
+            return UITableViewCell()
+        }
+        
+        cell.configure(m: self.matches[indexPath.section], u: self.selectedGameUsers)
+        
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("selected")
+        let vc = MatchViewController()
+        let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .popover
+        //        nc.sheetPresentationController?.detents = [.medium(), .large()]
+        nc.sheetPresentationController?.prefersGrabberVisible = true
+        self.navigationController?.present(nc, animated: true)
+    }
+    
+    @objc func onRefresh(_ sender: AnyObject) {
+        print("refresh table")
+        getGameUsers()
+        getMatches()
+        refreshControl.endRefreshing()
     }
 }
 
@@ -166,6 +273,7 @@ extension HomeViewController: AddGameViewControllerDelegate {
         let vc = AddGameViewController()
         vc.addGameViewControllerDelegate = self
         let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .popover
         nc.sheetPresentationController?.detents = [.medium(), .large()]
         nc.sheetPresentationController?.prefersGrabberVisible = true
         navigationController?.present(nc, animated: true)
@@ -173,5 +281,35 @@ extension HomeViewController: AddGameViewControllerDelegate {
     
     func onGameSaved() {
         print("game saved")
+    }
+}
+
+extension HomeViewController: SectionHeaderUIViewControllerDelegate {
+    func onMatchTap(match: MatchModel) {
+        //        db.collection("games").document(selectedGame.id).collection("matches").document(match.id).delete()
+        //        getMatches()
+        let vc = MatchViewController()
+        vc.configure(g: selectedGame, m: match, u: selectedGameUsers)
+        let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .pageSheet
+        nc.sheetPresentationController?.detents = [.medium()]
+        nc.sheetPresentationController?.prefersGrabberVisible = true
+        nc.setNavigationBarHidden(true, animated: true)
+        navigationController?.present(nc, animated: true)
+    }
+}
+
+
+extension HomeViewController {
+    @objc private func addMatchModal(_: UIBarButtonItem) {
+        let vc = AddMatchViewController()
+        vc.gameUsers = self.selectedGameUsers
+        vc.game = self.selectedGame
+        //        vc.addGameViewControllerDelegate = self
+        let nc = UINavigationController(rootViewController: vc)
+        nc.modalPresentationStyle = .popover
+        //        nc.sheetPresentationController?.detents = [.medium(), .large()]
+        nc.sheetPresentationController?.prefersGrabberVisible = true
+        navigationController?.present(nc, animated: true)
     }
 }

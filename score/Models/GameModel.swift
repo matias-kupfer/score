@@ -10,6 +10,7 @@ import UIKit
 
 struct GameModel: Codable {
     var name: String
+    var id: String
     var users: [String]
     var color: GameColorModel
 }

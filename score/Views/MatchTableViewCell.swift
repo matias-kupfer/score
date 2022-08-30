@@ -8,16 +8,69 @@
 import UIKit
 
 class MatchTableViewCell: UITableViewCell {
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    
+    static let identifier = "MatchTableViewCell"
+    
+    var match: MatchModel!
+    var users: [UserModel] = [UserModel]()
+    
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 100, height: 100)
+        layout.scrollDirection = .horizontal
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(UserCollectionViewCell.self, forCellWithReuseIdentifier: UserCollectionViewCell.identifier)
+        return collectionView
+    }()
+    
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        contentView.addSubview(collectionView)
+        collectionView.delegate = self
+        collectionView.dataSource = self
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    
+    required init?(coder: NSCoder) {
+        fatalError()
     }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        collectionView.frame = contentView.bounds
+    }
+    
+    public func configure(m: MatchModel, u: [UserModel]) {
+        match = m
+        users = u
+        orderUsers()
+        collectionView.reloadData()
+    }
+    
+    private func orderUsers() {
+        var orderedGameUsers: [UserModel] = []
+        for userId in match.order {
+            if let user = users.first(where: {$0.id == userId}) {
+                orderedGameUsers.append(user)
+            }
+        }
+        users = orderedGameUsers
+    }
+}
 
+extension MatchTableViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return users.count
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserCollectionViewCell.identifier, for: indexPath) as? UserCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(with: users[indexPath.row], position: indexPath.row)
+        return cell
+    }
+    
+    
 }

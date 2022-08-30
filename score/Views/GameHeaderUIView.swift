@@ -8,13 +8,46 @@
 import UIKit
 
 class GameHeaderUIView: UIView {
-
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
+    
+    let usersLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Welcome to Score. Select or create a game."
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: 18, weight: .regular)
+        return label
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addSubview(usersLabel)
     }
-    */
-
+    
+    public func configure(game: GameModel, users: [UserModel]) {
+        usersLabel.text = (users.compactMap { user -> String in
+            return user.name
+        }).joined(separator:", ")
+        let c = game.color
+        backgroundColor = UIColor(red: c.red, green: c.green, blue: c.blue, alpha: c.alpha)
+        
+        setUpConstraints()
+    }
+    
+    private func setUpConstraints() {
+        let margins = layoutMarginsGuide
+        var constraints = [NSLayoutConstraint]()
+        
+        //        constraints.append(x.topAnchor.constraint(equalTo: usersLabel.bottomAnchor, constant: 20))
+        
+        
+        NSLayoutConstraint.activate(constraints)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
 }

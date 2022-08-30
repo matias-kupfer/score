@@ -207,10 +207,11 @@ class AddGameViewController: UIViewController {
     
     @objc private func onSaveTask(_: UIBarButtonItem) {
         print(users)
-        let gameObject = GameModel(name: nameInputField.text!, users: self.users, color: gameColor!)
+        let gameObject = GameModel(name: nameInputField.text!, id: "id", users: self.users, color: gameColor!)
         let gamesRef = db.collection("games")
         do {
-            try gamesRef.addDocument(from: gameObject)
+            let gameRef: DocumentReference = try gamesRef.addDocument(from: gameObject)
+            gameRef.updateData(["id": gameRef.documentID])
         } catch let error {
             print("Error writing city to Firestore: \(error)")
         }
