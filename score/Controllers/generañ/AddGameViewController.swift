@@ -35,7 +35,7 @@ class AddGameViewController: UIViewController {
         return view
     }()
     
-  
+    
     
     let colorPicker: UIColorPickerViewController = {
         let colorPicker = UIColorPickerViewController()
@@ -45,7 +45,7 @@ class AddGameViewController: UIViewController {
     let colorPickerButton: UIButton = {
         let button = UIButton()
         button.setTitle("Color", for: .normal)
-//        button.setImage(UIImage(systemName: "eyedropper"), for: .normal)
+        //        button.setImage(UIImage(systemName: "eyedropper"), for: .normal)
         button.configuration = UIButton.Configuration.plain()
         button.configuration?.buttonSize = UIButton.Configuration.Size.medium
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -206,12 +206,17 @@ class AddGameViewController: UIViewController {
     }
     
     @objc private func onSaveTask(_: UIBarButtonItem) {
-        print(users)
         let gameObject = GameModel(name: nameInputField.text!, id: "id", users: self.users, color: gameColor!)
         let gamesRef = db.collection("games")
         do {
             let gameRef: DocumentReference = try gamesRef.addDocument(from: gameObject)
-            gameRef.updateData(["id": gameRef.documentID])
+            gameRef.updateData(["id": gameRef.documentID]) { (error: Error?) in
+                if let error = error {
+                    print("Data could not be saved: \(error).")
+                } else {
+                    self.dismiss(animated: true, completion: nil)
+                }
+            }
         } catch let error {
             print("Error writing city to Firestore: \(error)")
         }
@@ -229,7 +234,7 @@ extension AddGameViewController: UIColorPickerViewControllerDelegate {
         colorPicked.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
         gameColor = GameColorModel(red: red, blue: blue, green: green, alpha: alpha)
         colorPickerButton.backgroundColor = viewController.selectedColor
-//        color = viewController.selectedColor
+        //        color = viewController.selectedColor
     }
     
     @objc private func openColorPicker(_: UIButton) {

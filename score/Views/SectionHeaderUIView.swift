@@ -14,13 +14,12 @@ protocol SectionHeaderUIViewControllerDelegate: AnyObject {
 
 class SectionHeaderUIView: UIView {
     
-    public weak var delegate: SectionHeaderUIViewControllerDelegate?
+    public weak var sectionHeaderUIViewControllerDelegate: SectionHeaderUIViewControllerDelegate?
     
     public var match: MatchModel!
     
     let titleLable: UILabel = {
         let label = UILabel()
-        label.textColor = .red
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -34,7 +33,7 @@ class SectionHeaderUIView: UIView {
     }()
     
     let editIcon: UIImage = {
-        let image = UIImage(systemName: "trash")
+        let image = UIImage(systemName: "ellipsis")
         return image ?? UIImage()
     }()
     
@@ -62,14 +61,14 @@ class SectionHeaderUIView: UIView {
         
         let c: GameColorModel = game.color
         let color = UIColor(red: c.red, green: c.green, blue: c.blue, alpha: c.alpha)
-        editLable.textColor = color
-        // editIcon.tintColor = set game color to icon
+        titleLable.textColor = color
+        editButton.tintColor = color
         editButton.setImage(editIcon, for: .normal)
         
         let myTimeInterval = TimeInterval(m.date)
         let formatter = DateFormatter()
         formatter.dateFormat = "dd-MM-yyyy"
-        titleLable.text = formatter.string(from: NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date)
+        titleLable.text = formatter.string(from: NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date) + " " + m.id
     }
     
     private func setUpConstraints() {
@@ -87,6 +86,6 @@ class SectionHeaderUIView: UIView {
     }
     
     @objc private func onEdit(_: UIBarButtonItem) {
-        self.delegate?.onMatchTap(match: match)
+        self.sectionHeaderUIViewControllerDelegate?.onMatchTap(match: match)
     }
 }

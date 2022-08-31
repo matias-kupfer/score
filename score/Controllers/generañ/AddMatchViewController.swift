@@ -72,8 +72,13 @@ class AddMatchViewController: UIViewController {
         let matchRef = db.collection("games").document(game.id).collection("matches")
         do {
             let matchRef: DocumentReference = try matchRef.addDocument(from: match)
-            matchRef.updateData(["id": matchRef.documentID])
-            dismiss(animated: true, completion: nil)
+            matchRef.updateData(["id": matchRef.documentID]) { (error: Error?) in
+                if let error = error {
+                    print("Data could not be saved: \(error).")
+                } else {
+                    self.dismiss(animated: true, completion: nil)
+                }
+            }
         } catch let error {
             print("Error writing city to Firestore: \(error)")
         }
@@ -124,15 +129,15 @@ extension AddMatchViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     // sections
-//    func numberOfSections(in tableView: UITableView) -> Int {
-//        return 2
-//    }
-//
-//    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return 40
-//    }
-//
-//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        return sectionTitles[section]
-//    }
+    //    func numberOfSections(in tableView: UITableView) -> Int {
+    //        return 2
+    //    }
+    //
+    //    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    //        return 40
+    //    }
+    //
+    //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    //        return sectionTitles[section]
+    //    }
 }

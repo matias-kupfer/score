@@ -7,8 +7,19 @@
 
 import UIKit
 import SwiftUI
+import Firebase
+
+protocol MatchUIViewControllerDelegate: AnyObject {
+    func onDeleteMatch(match: MatchModel)
+}
 
 class MatchViewController: UIViewController {
+    
+    public var matchUIViewControllerDelegate: MatchUIViewControllerDelegate!
+    private var match: MatchModel!
+    private var game: GameModel!
+    private var db: Firebase.Firestore!
+    
     
     let dateLabel: UILabel = {
         let label = UILabel()
@@ -57,7 +68,7 @@ class MatchViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Delete Match", for: .normal)
         
-        //        button.addTarget(self, action: #selector(onEdit(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(onDeleteMatch(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -74,13 +85,17 @@ class MatchViewController: UIViewController {
         setUpConstraints()
     }
     
-    public func configure(g: GameModel, m: MatchModel, u: [UserModel]) {
+    public func configure(g: GameModel, m: MatchModel, users: [UserModel], db: Firebase.Firestore) {
         let myTimeInterval = TimeInterval(m.date)
         let formatter = DateFormatter()
         formatter.dateFormat = "dd-MM-yyyy"
         dateLabel.text = formatter.string(from: NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date)
         
-        orderUsers(m: m, u: u)
+        game = g
+        match = m
+        self.db = db
+        
+        orderUsers(m: m, u: users)
     }
     
     private func orderUsers(m: MatchModel, u: [UserModel]) {
@@ -131,5 +146,17 @@ class MatchViewController: UIViewController {
     
     @objc private func onCancel(_: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
+    }
+    
+    @objc private func onDeleteMatch(_: AnyObject) {
+        let matchRef = db.collection("games").document(game.id).collection("matches").document(match.id)
+        matchRef.delete() { (err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                self.matchUIViewControllerDelegate.onDeleteMatch(match: self.match)
+                self.dismiss(animated: true)
+            }
+        }
     }
 }

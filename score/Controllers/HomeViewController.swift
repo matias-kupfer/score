@@ -13,7 +13,7 @@ import Promises
 
 
 class HomeViewController: UIViewController {
-    let db = Firestore.firestore()
+    let db: Firebase.Firestore = Firestore.firestore()
     
     var games = [GameModel]()
     var selectedGame: GameModel!
@@ -216,7 +216,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let sectionHeaderUIView = SectionHeaderUIView()
-        sectionHeaderUIView.delegate = self
+        sectionHeaderUIView.sectionHeaderUIViewControllerDelegate = self
         sectionHeaderUIView.configure(m: matches[section], game: selectedGame)
         return sectionHeaderUIView
     }
@@ -240,24 +240,12 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MatchTableViewCell.identifier, for: indexPath) as? MatchTableViewCell else {
             return UITableViewCell()
         }
-        
         cell.configure(m: self.matches[indexPath.section], u: self.selectedGameUsers)
-        
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("selected")
-        let vc = MatchViewController()
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .popover
-        //        nc.sheetPresentationController?.detents = [.medium(), .large()]
-        nc.sheetPresentationController?.prefersGrabberVisible = true
-        self.navigationController?.present(nc, animated: true)
     }
     
     @objc func onRefresh(_ sender: AnyObject) {
@@ -286,16 +274,21 @@ extension HomeViewController: AddGameViewControllerDelegate {
 
 extension HomeViewController: SectionHeaderUIViewControllerDelegate {
     func onMatchTap(match: MatchModel) {
-        //        db.collection("games").document(selectedGame.id).collection("matches").document(match.id).delete()
-        //        getMatches()
         let vc = MatchViewController()
-        vc.configure(g: selectedGame, m: match, u: selectedGameUsers)
+        vc.matchUIViewControllerDelegate = self
+        vc.configure(g: selectedGame, m: match, users: selectedGameUsers, db: db)
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .pageSheet
         nc.sheetPresentationController?.detents = [.medium()]
         nc.sheetPresentationController?.prefersGrabberVisible = true
         nc.setNavigationBarHidden(true, animated: true)
         navigationController?.present(nc, animated: true)
+    }
+}
+
+extension HomeViewController: MatchUIViewControllerDelegate {
+    func onDeleteMatch(match: MatchModel) {
+        getMatches()
     }
 }
 
