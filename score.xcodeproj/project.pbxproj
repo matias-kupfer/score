@@ -8,12 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		75013EA728BD243400DADC34 /* SectionHeaderUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75013EA628BD243300DADC34 /* SectionHeaderUIView.swift */; };
-		75013EA928BF44D200DADC34 /* GameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75013EA828BF44D200DADC34 /* GameTableViewCell.swift */; };
+		75013EAB28BF4C4D00DADC34 /* GameCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75013EAA28BF4C4D00DADC34 /* GameCollectionViewCell.swift */; };
+		7523B3B428C0C39C005FDB36 /* GameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7523B3B328C0C39C005FDB36 /* GameTableViewCell.swift */; };
+		7523B3B628C7A139005FDB36 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7523B3B528C7A139005FDB36 /* GameViewController.swift */; };
 		7547DAC827F9B47A004D7564 /* Promises in Frameworks */ = {isa = PBXBuildFile; productRef = 7547DAC727F9B47A004D7564 /* Promises */; };
 		7547DACA27F9C2AA004D7564 /* MatchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7547DAC927F9C2AA004D7564 /* MatchTableViewCell.swift */; };
 		7547DACC27F9D275004D7564 /* UserCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7547DACB27F9D275004D7564 /* UserCollectionViewCell.swift */; };
 		7547DACE27F9E771004D7564 /* AddMatchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7547DACD27F9E771004D7564 /* AddMatchViewController.swift */; };
 		7547DAD028006D43004D7564 /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7547DACF28006D43004D7564 /* UserTableViewCell.swift */; };
+		755C86C028BFC92E00DB93EC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 755C86BF28BFC92E00DB93EC /* FirebaseAuth */; };
 		7570B37028B6388300A4AA40 /* MatchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7570B36F28B6388300A4AA40 /* MatchViewController.swift */; };
 		75B486A627F1D6BD003DE9DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486A527F1D6BD003DE9DD /* AppDelegate.swift */; };
 		75B486A827F1D6BD003DE9DD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486A727F1D6BD003DE9DD /* SceneDelegate.swift */; };
@@ -34,7 +37,9 @@
 
 /* Begin PBXFileReference section */
 		75013EA628BD243300DADC34 /* SectionHeaderUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderUIView.swift; sourceTree = "<group>"; };
-		75013EA828BF44D200DADC34 /* GameTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTableViewCell.swift; sourceTree = "<group>"; };
+		75013EAA28BF4C4D00DADC34 /* GameCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCollectionViewCell.swift; sourceTree = "<group>"; };
+		7523B3B328C0C39C005FDB36 /* GameTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTableViewCell.swift; sourceTree = "<group>"; };
+		7523B3B528C7A139005FDB36 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		7547DAC927F9C2AA004D7564 /* MatchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchTableViewCell.swift; sourceTree = "<group>"; };
 		7547DACB27F9D275004D7564 /* UserCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCollectionViewCell.swift; sourceTree = "<group>"; };
 		7547DACD27F9E771004D7564 /* AddMatchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMatchViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +69,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7547DAC827F9B47A004D7564 /* Promises in Frameworks */,
+				755C86C028BFC92E00DB93EC /* FirebaseAuth in Frameworks */,
 				75B486C527F1D7EF003DE9DD /* FirebaseFirestoreSwift-Beta in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -133,7 +139,8 @@
 				7547DACB27F9D275004D7564 /* UserCollectionViewCell.swift */,
 				7547DACF28006D43004D7564 /* UserTableViewCell.swift */,
 				75013EA628BD243300DADC34 /* SectionHeaderUIView.swift */,
-				75013EA828BF44D200DADC34 /* GameTableViewCell.swift */,
+				75013EAA28BF4C4D00DADC34 /* GameCollectionViewCell.swift */,
+				7523B3B328C0C39C005FDB36 /* GameTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -144,6 +151,7 @@
 				75B486CC27F3124C003DE9DD /* AddGameViewController.swift */,
 				7547DACD27F9E771004D7564 /* AddMatchViewController.swift */,
 				7570B36F28B6388300A4AA40 /* MatchViewController.swift */,
+				7523B3B528C7A139005FDB36 /* GameViewController.swift */,
 			);
 			name = general;
 			path = "generañ";
@@ -168,6 +176,7 @@
 			packageProductDependencies = (
 				75B486C427F1D7EF003DE9DD /* FirebaseFirestoreSwift-Beta */,
 				7547DAC727F9B47A004D7564 /* Promises */,
+				755C86BF28BFC92E00DB93EC /* FirebaseAuth */,
 			);
 			productName = score;
 			productReference = 75B486A227F1D6BD003DE9DD /* score.app */;
@@ -200,6 +209,7 @@
 			packageReferences = (
 				75B486C327F1D7EF003DE9DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				7547DAC627F9B47A004D7564 /* XCRemoteSwiftPackageReference "promises" */,
+				755C86BE28BFC92E00DB93EC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 75B486A327F1D6BD003DE9DD /* Products */;
 			projectDirPath = "";
@@ -228,6 +238,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7523B3B628C7A139005FDB36 /* GameViewController.swift in Sources */,
 				75B486C027F1D74B003DE9DD /* ProfileViewController.swift in Sources */,
 				75B486BE27F1D720003DE9DD /* HomeViewController.swift in Sources */,
 				75B486D527F89DAC003DE9DD /* MatchModel.swift in Sources */,
@@ -238,11 +249,12 @@
 				7547DACC27F9D275004D7564 /* UserCollectionViewCell.swift in Sources */,
 				7570B37028B6388300A4AA40 /* MatchViewController.swift in Sources */,
 				75B486A627F1D6BD003DE9DD /* AppDelegate.swift in Sources */,
+				7523B3B428C0C39C005FDB36 /* GameTableViewCell.swift in Sources */,
 				75B486D327F87171003DE9DD /* GameHeaderUIView.swift in Sources */,
-				75013EA928BF44D200DADC34 /* GameTableViewCell.swift in Sources */,
 				7547DACA27F9C2AA004D7564 /* MatchTableViewCell.swift in Sources */,
 				75B486CD27F3124C003DE9DD /* AddGameViewController.swift in Sources */,
 				75B486C227F1D754003DE9DD /* GameModel.swift in Sources */,
+				75013EAB28BF4C4D00DADC34 /* GameCollectionViewCell.swift in Sources */,
 				75B486A827F1D6BD003DE9DD /* SceneDelegate.swift in Sources */,
 				75B486D127F5AFD8003DE9DD /* UserCardView.swift in Sources */,
 				75B486CF27F5AF00003DE9DD /* UserModel.swift in Sources */,
@@ -463,6 +475,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		755C86BE28BFC92E00DB93EC /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		75B486C327F1D7EF003DE9DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -478,6 +498,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7547DAC627F9B47A004D7564 /* XCRemoteSwiftPackageReference "promises" */;
 			productName = Promises;
+		};
+		755C86BF28BFC92E00DB93EC /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 75B486C327F1D7EF003DE9DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 		75B486C427F1D7EF003DE9DD /* FirebaseFirestoreSwift-Beta */ = {
 			isa = XCSwiftPackageProductDependency;

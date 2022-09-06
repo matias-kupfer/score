@@ -68,7 +68,7 @@ class SectionHeaderUIView: UIView {
         let myTimeInterval = TimeInterval(m.date)
         let formatter = DateFormatter()
         formatter.dateFormat = "dd-MM-yyyy"
-        titleLable.text = formatter.string(from: NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date) + " " + m.id
+        titleLable.text = formatter.string(from: NSDate(timeIntervalSince1970: TimeInterval(myTimeInterval)) as Date)
     }
     
     private func setUpConstraints() {

@@ -22,7 +22,7 @@ class HomeViewController: UIViewController {
     
     private var gameHeaderUIView: GameHeaderUIView!
     
-    let rightBarButton: UIBarButtonItem = {
+    let rightNavigationButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
         button.image = UIImage(systemName: "plus")
         button.style = UIBarButtonItem.Style.plain
@@ -31,7 +31,7 @@ class HomeViewController: UIViewController {
         return button
     }()
     
-    let leftBarButton: UIBarButtonItem = {
+    let leftNavigationButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
         button.image = UIImage(systemName: "list.bullet")
         button.style = UIBarButtonItem.Style.plain
@@ -65,15 +65,16 @@ class HomeViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Score"
         //        navigationItem.titleView = selectGameButton
-        leftBarButton.target = self
-        rightBarButton.target = self
-        navigationItem.rightBarButtonItem = rightBarButton
+        leftNavigationButton.target = self
+        rightNavigationButton.target = self
+        navigationItem.rightBarButtonItem = rightNavigationButton
         
         activityIndicator.center = self.view.center
         //view.addSubview(activityIndicator)
         
         gameHeaderUIView = GameHeaderUIView()
         gameHeaderUIView.translatesAutoresizingMaskIntoConstraints = false
+        
         table.tableHeaderView = gameHeaderUIView
         table.delegate = self
         table.dataSource = self
@@ -118,7 +119,7 @@ class HomeViewController: UIViewController {
                     return try! queryDocumentSnapshot.data(as: GameModel.self)
                 }
                 self.activityIndicator.stopAnimating()
-                self.navigationItem.leftBarButtonItem = self.leftBarButton
+                self.navigationItem.leftBarButtonItem = self.leftNavigationButton
                 self.configureMenu()
             }
         }
@@ -131,7 +132,7 @@ class HomeViewController: UIViewController {
             })
         }
         let menu: UIMenu = UIMenu(title: "Your games", subtitle: "choose", image: UIImage(systemName: "plus"), children: actions)
-        leftBarButton.menu = menu
+        leftNavigationButton.menu = menu
     }
     
     private func selectGame(uiActionEvent: UIAction) {
@@ -203,8 +204,8 @@ class HomeViewController: UIViewController {
     private func changeColor() {
         let c: GameColorModel = selectedGame.color
         let color: UIColor = UIColor(red: c.red, green: c.green, blue: c.blue, alpha: c.alpha)
-        leftBarButton.tintColor = color
-        rightBarButton.tintColor = color
+        leftNavigationButton.tintColor = color
+        rightNavigationButton.tintColor = color
     }
 }
 
@@ -253,22 +254,6 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         getGameUsers()
         getMatches()
         refreshControl.endRefreshing()
-    }
-}
-
-extension HomeViewController: AddGameViewControllerDelegate {
-    @objc private func addGameModal(_: UIBarButtonItem) {
-        let vc = AddGameViewController()
-        vc.addGameViewControllerDelegate = self
-        let nc = UINavigationController(rootViewController: vc)
-        nc.modalPresentationStyle = .popover
-        nc.sheetPresentationController?.detents = [.medium(), .large()]
-        nc.sheetPresentationController?.prefersGrabberVisible = true
-        navigationController?.present(nc, animated: true)
-    }
-    
-    func onGameSaved() {
-        print("game saved")
     }
 }
 
