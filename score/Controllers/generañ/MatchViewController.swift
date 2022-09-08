@@ -68,7 +68,7 @@ class MatchViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Delete Match", for: .normal)
         
-        button.addTarget(self, action: #selector(onDeleteMatch(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(onDeleteMatch), for: .touchUpInside)
         return button
     }()
     
@@ -144,11 +144,11 @@ class MatchViewController: UIViewController {
         NSLayoutConstraint.activate(constraints)
     }
     
-    @objc private func onCancel(_: UIBarButtonItem) {
+    @objc private func onCancel() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc private func onDeleteMatch(_: AnyObject) {
+    @objc private func onDeleteMatch() {
         let matchRef = db.collection("games").document(game.id).collection("matches").document(match.id)
         matchRef.delete() { (err) in
             if let err = err {

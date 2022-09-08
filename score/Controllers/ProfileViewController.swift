@@ -6,8 +6,8 @@
 //
 
 import UIKit
-import FirebaseAuth
 import Firebase
+import FirebaseAuth
 import FirebaseFirestoreSwift
 
 class ProfileViewController: UIViewController {
@@ -16,91 +16,20 @@ class ProfileViewController: UIViewController {
     let db: Firebase.Firestore = Firestore.firestore()
     var games = [GameModel]()
     
-    let defaultText: String = "Login to see your profile"
-    
     let leftNavigationButton: UIBarButtonItem = {
-        let button = UIBarButtonItem()
-        button.image = UIImage(systemName: "plus")
-        button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(ProfileViewController.addGameModal(_:))
-        button.isEnabled = false
-        return button
-    }()
+            let button = UIBarButtonItem()
+            button.image = UIImage(systemName: "plus")
+            button.style = UIBarButtonItem.Style.plain
+            button.action = #selector(ProfileViewController.addGameModal)
+            return button
+        }()
     
     let rightNavigationButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
         button.image = UIImage(systemName: "rectangle.portrait.and.arrow.right")
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(ProfileViewController.onLogoutClick(_:))
-        button.isEnabled = false
+        button.action = #selector(ProfileViewController.onLogoutClick)
         return button
-    }()
-    
-    let headerLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 18, weight: .regular)
-        return label
-    }()
-    
-    let loginView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.tag = 1
-        return view
-    }()
-    
-    let emailInputField: UITextField = {
-        let input = UITextField()
-        input.placeholder = "Email"
-        input.text = "matias@score.com"
-        input.translatesAutoresizingMaskIntoConstraints = false
-        input.font = UIFont.systemFont(ofSize: 24)
-        input.borderStyle = .none
-        input.autocorrectionType = .no
-        input.keyboardType = .emailAddress
-        input.returnKeyType = .next
-        input.clearButtonMode = .whileEditing
-        input.contentVerticalAlignment = .center
-        return input
-    }()
-    
-    let passwordInputField: UITextField = {
-        let input = UITextField()
-        input.text = "qwerty"
-        input.placeholder = "******"
-        input.translatesAutoresizingMaskIntoConstraints = false
-        input.font = UIFont.systemFont(ofSize: 24)
-        input.borderStyle = .none
-        input.autocorrectionType = .no
-        input.keyboardType = .default
-        input.returnKeyType = .next
-        input.clearButtonMode = .whileEditing
-        input.contentVerticalAlignment = .center
-        return input
-    }()
-    
-    let loginButton: UIButton = {
-        var config = UIButton.Configuration.filled()
-        config.buttonSize = .large
-        config.baseBackgroundColor = .systemBlue
-        config.cornerStyle = .medium
-        config.image = UIImage(systemName: "arrow.right.circle")
-        config.imagePadding = 5
-        config.imagePlacement = .trailing
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
-        
-        let button = UIButton(configuration: config, primaryAction: nil)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Login", for: .normal)
-        
-        button.addTarget(self, action: #selector(onLoginClick(_:)), for: .touchUpInside)
-        return button
-    }()
-    
-    let progressView: UIActivityIndicatorView = {
-        let progressView = UIActivityIndicatorView()
-        return progressView
     }()
     
     let table: UITableView = {
@@ -111,27 +40,20 @@ class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("viewDidLoad ProfileViewController")
         
         navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Login"
+        title = "Profile"
         leftNavigationButton.target = self
-        navigationItem.leftBarButtonItem = leftNavigationButton
         rightNavigationButton.target = self
-        navigationItem.rightBarButtonItem = rightNavigationButton
-        
-        headerLabel.text = defaultText
+        self.navigationItem.leftBarButtonItem = leftNavigationButton
+        self.navigationItem.rightBarButtonItem = rightNavigationButton
         
         //        table.tableHeaderView = gameHeaderUIView
         table.delegate = self
         table.dataSource = self
         
-        //        view.addSubview(headerLabel)
-        view.addSubview(loginView)
-        loginView.addSubview(emailInputField)
-        loginView.addSubview(passwordInputField)
-        loginView.addSubview(loginButton)
-        
+        getGames()
         setUpConstraints()
     }
     
@@ -143,62 +65,8 @@ class ProfileViewController: UIViewController {
     private func setUpConstraints() {
         var constraints = [NSLayoutConstraint]()
         
-        //        constraints.append(headerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20))
-        //        constraints.append(headerLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20))
-        //        constraints.append(headerLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20))
-        
-        constraints.append(loginView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20))
-        constraints.append(loginView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20))
-        constraints.append(loginView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20))
-        constraints.append(loginView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor))
-        
-        constraints.append(emailInputField.topAnchor.constraint(equalTo: loginView.safeAreaLayoutGuide.topAnchor))
-        constraints.append(emailInputField.leadingAnchor.constraint(equalTo: loginView.safeAreaLayoutGuide.leadingAnchor))
-        constraints.append(emailInputField.trailingAnchor.constraint(equalTo: loginView.safeAreaLayoutGuide.trailingAnchor))
-        
-        constraints.append(passwordInputField.topAnchor.constraint(equalTo: emailInputField.topAnchor, constant: 60))
-        constraints.append(passwordInputField.leadingAnchor.constraint(equalTo: loginView.safeAreaLayoutGuide.leadingAnchor))
-        constraints.append(passwordInputField.trailingAnchor.constraint(equalTo: loginView.safeAreaLayoutGuide.trailingAnchor))
-        
-        constraints.append(loginButton.topAnchor.constraint(equalTo: passwordInputField.topAnchor, constant: 80))
-        constraints.append(loginButton.leadingAnchor.constraint(equalTo: loginView.safeAreaLayoutGuide.leadingAnchor))
-        constraints.append(loginButton.trailingAnchor.constraint(equalTo: loginView.safeAreaLayoutGuide.trailingAnchor))
         
         NSLayoutConstraint.activate(constraints)
-    }
-    
-    @objc private func onLoginClick(_: AnyObject) {
-        auth.signIn(withEmail: emailInputField.text!, password: passwordInputField.text!) { [weak self] authResult, error in
-            if (error != nil) {
-                print(error)
-            } else {
-                print(authResult!.user)
-                if let viewToDelete = self!.view.viewWithTag(1) {
-                    viewToDelete.removeFromSuperview()
-                }
-                self?.title = "Profile"
-                self?.headerLabel.text = authResult!.user.email
-                self?.leftNavigationButton.isEnabled = true
-                self?.rightNavigationButton.isEnabled = true
-                self?.getGames()
-                //                self?.view.addSubview(self!.table)
-                print("logged in")
-            }
-        }
-    }
-    
-    @objc private func onLogoutClick(_: AnyObject) {
-        do {
-            try auth.signOut()
-            self.title = "Login"
-            self.headerLabel.text = defaultText
-            leftNavigationButton.isEnabled = false
-            rightNavigationButton.isEnabled = false
-            view.addSubview(loginView)
-            setUpConstraints()
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError)
-        }
     }
     
     private func getGames() {
@@ -231,10 +99,20 @@ class ProfileViewController: UIViewController {
             }
         }
     }
+    
+    @objc private func onLogoutClick() {
+        print("onlogoutclick")
+        do {
+            try auth.signOut()
+            print("user logged out")
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+        }
+    }
 }
 
 extension ProfileViewController: AddGameViewControllerDelegate {
-    @objc private func addGameModal(_: UIBarButtonItem) {
+    @objc private func addGameModal() {
         let vc = AddGameViewController()
         vc.addGameViewControllerDelegate = self
         let nc = UINavigationController(rootViewController: vc)

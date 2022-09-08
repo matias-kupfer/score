@@ -40,7 +40,7 @@ class SectionHeaderUIView: UIView {
     let editButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(onEdit(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(onEdit), for: .touchUpInside)
         return button
     }()
     
@@ -85,7 +85,7 @@ class SectionHeaderUIView: UIView {
         NSLayoutConstraint.activate(constraints)
     }
     
-    @objc private func onEdit(_: UIBarButtonItem) {
+    @objc private func onEdit() {
         self.sectionHeaderUIViewControllerDelegate?.onMatchTap(match: match)
     }
 }

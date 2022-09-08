@@ -35,28 +35,11 @@ class AddGameViewController: UIViewController {
         return view
     }()
     
-    
-    
-    let colorPicker: UIColorPickerViewController = {
-        let colorPicker = UIColorPickerViewController()
-        return colorPicker
-    }()
-    
-    let colorPickerButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Color", for: .normal)
-        //        button.setImage(UIImage(systemName: "eyedropper"), for: .normal)
-        button.configuration = UIButton.Configuration.plain()
-        button.configuration?.buttonSize = UIButton.Configuration.Size.medium
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
     let leftBarButtonItem: UIBarButtonItem = {
         var button = UIBarButtonItem()
         button.title = "Cancel"
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(onCancel(_:))
+        button.action = #selector(onCancel)
         button.tintColor = .red
         return button
     }()
@@ -65,7 +48,7 @@ class AddGameViewController: UIViewController {
         var button = UIBarButtonItem()
         button.title = "Save"
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(onSaveTask(_:))
+        button.action = #selector(onSaveTask)
         button.tintColor = .systemBlue
         return button
     }()
@@ -116,6 +99,30 @@ class AddGameViewController: UIViewController {
         input.clearButtonMode = .whileEditing
         input.contentVerticalAlignment = .center
         return input
+    }()
+    
+    let searchUserButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "send.png"), for: .normal)
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -16, bottom: 0, right: 0)
+//        button.frame = CGRect(x: CGFloat(txt.frame.size.width - 25), y: CGFloat(5), width: CGFloat(25), height: CGFloat(25))
+//        button.addTarget(self, action: #selector(self.refresh), for: .touchUpInside)
+        return button
+    }()
+    
+    let colorPicker: UIColorPickerViewController = {
+        let colorPicker = UIColorPickerViewController()
+        return colorPicker
+    }()
+    
+    let colorPickerButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Color", for: .normal)
+        //        button.setImage(UIImage(systemName: "eyedropper"), for: .normal)
+        button.configuration = UIButton.Configuration.plain()
+        button.configuration?.buttonSize = UIButton.Configuration.Size.medium
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     override func viewDidLoad() {
@@ -201,11 +208,11 @@ class AddGameViewController: UIViewController {
         
     }
     
-    @objc private func onCancel(_: UIBarButtonItem) {
+    @objc private func onCancel() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc private func onSaveTask(_: UIBarButtonItem) {
+    @objc private func onSaveTask() {
         let gameObject = GameModel(name: nameInputField.text!, id: "id", users: self.users, color: gameColor!)
         let gamesRef = db.collection("games")
         do {

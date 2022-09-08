@@ -20,7 +20,7 @@ class AddMatchViewController: UIViewController {
         var button = UIBarButtonItem()
         button.title = "Cancel"
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(onCancel(_:))
+        button.action = #selector(onCancel)
         button.tintColor = .red
         return button
     }()
@@ -29,7 +29,7 @@ class AddMatchViewController: UIViewController {
         var button = UIBarButtonItem()
         button.title = "Save"
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(onSaveMatch(_:))
+        button.action = #selector(onSaveMatch)
         button.tintColor = .systemBlue
         return button
     }()
@@ -60,11 +60,11 @@ class AddMatchViewController: UIViewController {
         setUpConstraints()
     }
     
-    @objc private func onCancel(_: UIBarButtonItem) {
+    @objc private func onCancel() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc private func onSaveMatch(_: UIBarButtonItem) {
+    @objc private func onSaveMatch() {
         let usersIds: [String] = gameUsers.compactMap { user -> String in
             return user.id
         }

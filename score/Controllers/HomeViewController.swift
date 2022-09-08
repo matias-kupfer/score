@@ -7,12 +7,14 @@
 
 import UIKit
 import Firebase
+import FirebaseAuth
 import FirebaseFirestoreSwift
-import WebKit
 import Promises
 
 
 class HomeViewController: UIViewController {
+    
+    let auth = FirebaseAuth.Auth.auth()
     let db: Firebase.Firestore = Firestore.firestore()
     
     var games = [GameModel]()
@@ -22,19 +24,18 @@ class HomeViewController: UIViewController {
     
     private var gameHeaderUIView: GameHeaderUIView!
     
-    let rightNavigationButton: UIBarButtonItem = {
-        let button = UIBarButtonItem()
-        button.image = UIImage(systemName: "plus")
-        button.style = UIBarButtonItem.Style.plain
-        //                button.action = #selector(HomeViewController.addGameModal(_:))
-        button.action = #selector(HomeViewController.addMatchModal(_:))
-        return button
-    }()
-    
     let leftNavigationButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
         button.image = UIImage(systemName: "list.bullet")
         button.style = UIBarButtonItem.Style.plain
+        return button
+    }()
+    
+    let rightNavigationButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
+        button.image = UIImage(systemName: "plus")
+        button.style = UIBarButtonItem.Style.plain
+        button.action = #selector(HomeViewController.addMatchModal)
         return button
     }()
     
@@ -57,9 +58,10 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("viewDidLoad HomeViewController")
         
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
-        refreshControl.addTarget(self, action: #selector(self.onRefresh(_:)), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(self.onRefresh), for: .valueChanged)
         table.addSubview(refreshControl)
         
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -68,6 +70,7 @@ class HomeViewController: UIViewController {
         leftNavigationButton.target = self
         rightNavigationButton.target = self
         navigationItem.rightBarButtonItem = rightNavigationButton
+        self.navigationItem.leftBarButtonItem = self.leftNavigationButton
         
         activityIndicator.center = self.view.center
         //view.addSubview(activityIndicator)
@@ -80,7 +83,17 @@ class HomeViewController: UIViewController {
         table.dataSource = self
         view.addSubview(table)
         
-        getGames()
+        if (auth.currentUser?.uid != nil) {
+            print("user is logged in: " + auth.currentUser!.uid)
+            self.navigationItem.leftBarButtonItem?.isEnabled = true
+            getGames()
+        }
+//        else {
+//            let vc = LoginViewController()
+//            let nc = UINavigationController(rootViewController: vc)
+//            nc.modalPresentationStyle = .fullScreen
+//            navigationController?.present(nc, animated: false)
+//        }
         setUpConstraints()
     }
     
@@ -141,6 +154,7 @@ class HomeViewController: UIViewController {
         getGameUsers()
         getMatches()
         changeColor()
+        navigationItem.rightBarButtonItem?.isEnabled = true
     }
     
     private func getGameUsers() {
@@ -249,7 +263,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
         return 50
     }
     
-    @objc func onRefresh(_ sender: AnyObject) {
+    @objc func onRefresh() {
         print("refresh table")
         getGameUsers()
         getMatches()
@@ -279,7 +293,7 @@ extension HomeViewController: MatchUIViewControllerDelegate {
 
 
 extension HomeViewController {
-    @objc private func addMatchModal(_: UIBarButtonItem) {
+    @objc private func addMatchModal() {
         let vc = AddMatchViewController()
         vc.gameUsers = self.selectedGameUsers
         vc.game = self.selectedGame

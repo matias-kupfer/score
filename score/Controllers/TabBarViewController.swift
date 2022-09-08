@@ -23,7 +23,6 @@ class TabBarViewController: UITabBarController {
         vc1.title = "Scores"
         vc2.title = "Profile"
         
-        
         setViewControllers([vc1, vc2], animated: true)
     }
 
