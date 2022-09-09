@@ -81,6 +81,46 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7523B3BB28CB65D1005FDB36 /* TableCell */ = {
+			isa = PBXGroup;
+			children = (
+				7547DAC927F9C2AA004D7564 /* MatchTableViewCell.swift */,
+				7547DACF28006D43004D7564 /* UserTableViewCell.swift */,
+				7523B3B328C0C39C005FDB36 /* GameTableViewCell.swift */,
+			);
+			path = TableCell;
+			sourceTree = "<group>";
+		};
+		7523B3BC28CB6615005FDB36 /* CollectionCell */ = {
+			isa = PBXGroup;
+			children = (
+				7547DACB27F9D275004D7564 /* UserCollectionViewCell.swift */,
+				75013EAA28BF4C4D00DADC34 /* GameCollectionViewCell.swift */,
+			);
+			path = CollectionCell;
+			sourceTree = "<group>";
+		};
+		7523B3BD28CB6626005FDB36 /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				75B486D227F87171003DE9DD /* GameHeaderUIView.swift */,
+				7523B3B928CA2597005FDB36 /* ProfileHeaderUIView.swift */,
+				75013EA628BD243300DADC34 /* SectionHeaderUIView.swift */,
+			);
+			path = Header;
+			sourceTree = "<group>";
+		};
+		7523B3BE28CB663A005FDB36 /* Modals */ = {
+			isa = PBXGroup;
+			children = (
+				75B486CC27F3124C003DE9DD /* AddGameViewController.swift */,
+				7547DACD27F9E771004D7564 /* AddMatchViewController.swift */,
+				7570B36F28B6388300A4AA40 /* MatchViewController.swift */,
+				7523B3B528C7A139005FDB36 /* GameViewController.swift */,
+			);
+			path = Modals;
+			sourceTree = "<group>";
+		};
 		75B4869927F1D6BD003DE9DD = {
 			isa = PBXGroup;
 			children = (
@@ -137,15 +177,10 @@
 		75B486C827F2FE0E003DE9DD /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7523B3BD28CB6626005FDB36 /* Header */,
+				7523B3BC28CB6615005FDB36 /* CollectionCell */,
+				7523B3BB28CB65D1005FDB36 /* TableCell */,
 				75B486D027F5AFD8003DE9DD /* UserCardView.swift */,
-				75B486D227F87171003DE9DD /* GameHeaderUIView.swift */,
-				7523B3B928CA2597005FDB36 /* ProfileHeaderUIView.swift */,
-				7547DAC927F9C2AA004D7564 /* MatchTableViewCell.swift */,
-				7547DACB27F9D275004D7564 /* UserCollectionViewCell.swift */,
-				7547DACF28006D43004D7564 /* UserTableViewCell.swift */,
-				75013EA628BD243300DADC34 /* SectionHeaderUIView.swift */,
-				75013EAA28BF4C4D00DADC34 /* GameCollectionViewCell.swift */,
-				7523B3B328C0C39C005FDB36 /* GameTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -153,10 +188,7 @@
 		75B486CB27F31223003DE9DD /* general */ = {
 			isa = PBXGroup;
 			children = (
-				75B486CC27F3124C003DE9DD /* AddGameViewController.swift */,
-				7547DACD27F9E771004D7564 /* AddMatchViewController.swift */,
-				7570B36F28B6388300A4AA40 /* MatchViewController.swift */,
-				7523B3B528C7A139005FDB36 /* GameViewController.swift */,
+				7523B3BE28CB663A005FDB36 /* Modals */,
 				7523B3B728C9E90A005FDB36 /* LoginViewController.swift */,
 			);
 			name = general;
