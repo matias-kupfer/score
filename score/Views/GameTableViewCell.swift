@@ -20,7 +20,6 @@ class GameTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubview(gameTitleLabel)
-        contentView.backgroundColor = .red
         setUpConstraints()
     }
     
@@ -34,6 +33,8 @@ class GameTableViewCell: UITableViewCell {
     
     public func configure(g: GameModel) {
         self.gameTitleLabel.text = g.name
+        let c: GameColorModel = g.color
+        self.backgroundColor = UIColor(red: c.red, green: c.green, blue: c.blue, alpha: c.alpha)
     }
     
     private func setUpConstraints() {

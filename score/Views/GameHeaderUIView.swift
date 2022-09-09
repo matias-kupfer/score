@@ -14,7 +14,7 @@ class GameHeaderUIView: UIView {
 
     let usersLabel: UILabel = {
         let label = UILabel()
-        label.text = "Welcome! Login to select a game."
+        label.text = "Welcome! Select a game to see more."
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 18, weight: .regular)
         return label

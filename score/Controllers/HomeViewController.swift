@@ -36,6 +36,7 @@ class HomeViewController: UIViewController {
         button.image = UIImage(systemName: "plus")
         button.style = UIBarButtonItem.Style.plain
         button.action = #selector(HomeViewController.addMatchModal)
+        button.isEnabled = false
         return button
     }()
     
@@ -128,8 +129,11 @@ class HomeViewController: UIViewController {
                     self.activityIndicator.stopAnimating()
                     return
                 }
-                self.games = documents.compactMap { queryDocumentSnapshot -> GameModel? in
-                    return try! queryDocumentSnapshot.data(as: GameModel.self)
+                for document in documents {
+                    let game: GameModel = try! document.data(as: GameModel.self)
+                    if (game.users.contains(self.auth.currentUser!.uid)) {
+                        self.games.append(game)
+                    }
                 }
                 self.activityIndicator.stopAnimating()
                 self.navigationItem.leftBarButtonItem = self.leftNavigationButton
@@ -172,6 +176,7 @@ class HomeViewController: UIViewController {
     }
     
     private func getMatches() {
+        matches = []
         let matchesRef = db.collection("games").document(selectedGame.id).collection("matches").order(by: "date", descending: true)
         matchesRef.getDocuments() { (querySnapshot, err) in
             if let err = err {

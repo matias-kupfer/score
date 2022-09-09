@@ -15,14 +15,15 @@ class ProfileViewController: UIViewController {
     let auth = FirebaseAuth.Auth.auth()
     let db: Firebase.Firestore = Firestore.firestore()
     var games = [GameModel]()
+    private var profileHeaderUIView: ProfileHeaderUIView!
     
     let leftNavigationButton: UIBarButtonItem = {
-            let button = UIBarButtonItem()
-            button.image = UIImage(systemName: "plus")
-            button.style = UIBarButtonItem.Style.plain
-            button.action = #selector(ProfileViewController.addGameModal)
-            return button
-        }()
+        let button = UIBarButtonItem()
+        button.image = UIImage(systemName: "plus")
+        button.style = UIBarButtonItem.Style.plain
+        button.action = #selector(ProfileViewController.addGameModal)
+        return button
+    }()
     
     let rightNavigationButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
@@ -49,12 +50,15 @@ class ProfileViewController: UIViewController {
         self.navigationItem.leftBarButtonItem = leftNavigationButton
         self.navigationItem.rightBarButtonItem = rightNavigationButton
         
-        //        table.tableHeaderView = gameHeaderUIView
+        profileHeaderUIView = ProfileHeaderUIView()
+        profileHeaderUIView.translatesAutoresizingMaskIntoConstraints = false
+        
+        table.tableHeaderView = profileHeaderUIView
         table.delegate = self
         table.dataSource = self
         
         getGames()
-        setUpConstraints()
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -64,7 +68,10 @@ class ProfileViewController: UIViewController {
     
     private func setUpConstraints() {
         var constraints = [NSLayoutConstraint]()
+        let margins = view.layoutMarginsGuide
         
+        constraints.append(profileHeaderUIView.leadingAnchor.constraint(equalTo: margins.leadingAnchor))
+        constraints.append(profileHeaderUIView.trailingAnchor.constraint(equalTo: margins.trailingAnchor))
         
         NSLayoutConstraint.activate(constraints)
     }
@@ -92,6 +99,8 @@ class ProfileViewController: UIViewController {
                     }
                 }
                 self.view.addSubview(self.table)
+                self.setUpConstraints()
+                self.profileHeaderUIView.configure(g: self.games)
                 self.table.reloadData()
                 //                self.activityIndicator.stopAnimating()
                 //                self.navigationItem.leftBarButtonItem = self.leftNavigationButton
@@ -138,6 +147,10 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         return games.count
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return profileHeaderUIView
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: GameTableViewCell.identifier, for: indexPath) as? GameTableViewCell else {
             return UITableViewCell()
@@ -147,7 +160,7 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 150
+        return 100
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

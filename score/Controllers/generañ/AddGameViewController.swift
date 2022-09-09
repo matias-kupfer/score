@@ -184,7 +184,6 @@ class AddGameViewController: UIViewController {
     }
     
     @objc private func searchUser(_ textField: UITextField) {
-        //        self.rightBarButtonItem.isEnabled = textField.text != ""
         let usersRef = db.collection("users").whereField("username", isEqualTo: textField.text!).limit(to: 1)
         usersRef.getDocuments() { (querySnapshot, err) in
             if let err = err {

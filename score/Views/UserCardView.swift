@@ -13,6 +13,7 @@ class UserCardView: UIView {
     
     let nameLabel: UILabel = {
         let label = UILabel()
+        label.text = ""
         return label
     }()
     
@@ -23,6 +24,7 @@ class UserCardView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        nameLabel.frame = bounds
     }
     
     required init?(coder: NSCoder) {
@@ -31,10 +33,7 @@ class UserCardView: UIView {
 
     public func configure(with user: UserModel) {
         users.append(user)
-        var label: UILabel = UILabel()
-        label.text = "@" + user.username
-        label.frame = bounds
-        addSubview(label)
+        nameLabel.text = nameLabel.text! + "@" + user.username + ", "
     }
     
     
