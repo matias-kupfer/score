@@ -7,7 +7,7 @@
 
 import UIKit
 
-class UserCollectionViewCell: UICollectionViewCell {
+class MatchUsersCollectionViewCell: UICollectionViewCell {
     static let identifier = "UserCollectionViewCell"
     
     

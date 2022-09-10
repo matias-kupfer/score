@@ -19,7 +19,7 @@ class MatchTableViewCell: UITableViewCell {
         layout.itemSize = CGSize(width: 100, height: 100)
         layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(UserCollectionViewCell.self, forCellWithReuseIdentifier: UserCollectionViewCell.identifier)
+        collectionView.register(MatchUsersCollectionViewCell.self, forCellWithReuseIdentifier: MatchUsersCollectionViewCell.identifier)
         return collectionView
     }()
     
@@ -65,7 +65,7 @@ extension MatchTableViewCell: UICollectionViewDelegate, UICollectionViewDataSour
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserCollectionViewCell.identifier, for: indexPath) as? UserCollectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MatchUsersCollectionViewCell.identifier, for: indexPath) as? MatchUsersCollectionViewCell else {
             return UICollectionViewCell()
         }
         cell.configure(with: users[indexPath.row], position: indexPath.row)

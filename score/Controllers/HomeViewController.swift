@@ -28,6 +28,7 @@ class HomeViewController: UIViewController {
         let button = UIBarButtonItem()
         button.image = UIImage(systemName: "list.bullet")
         button.style = UIBarButtonItem.Style.plain
+        button.isEnabled = false
         return button
     }()
     
@@ -86,7 +87,6 @@ class HomeViewController: UIViewController {
         
         if (auth.currentUser?.uid != nil) {
             print("user is logged in: " + auth.currentUser!.uid)
-            self.navigationItem.leftBarButtonItem?.isEnabled = true
             getGames()
         }
 //        else {
@@ -137,6 +137,9 @@ class HomeViewController: UIViewController {
                 }
                 self.activityIndicator.stopAnimating()
                 self.navigationItem.leftBarButtonItem = self.leftNavigationButton
+                if (!self.games.isEmpty) {
+                    self.navigationItem.leftBarButtonItem?.isEnabled = true
+                }
                 self.configureMenu()
             }
         }

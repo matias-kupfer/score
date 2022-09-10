@@ -7,8 +7,8 @@
 
 import UIKit
 
-class GameCollectionViewCell: UICollectionViewCell {
-    static let identifier = "GameCollectionViewCell"
+class GameUsersCollectionViewCell: UICollectionViewCell {
+    static let identifier = "GameUsersCollectionViewCell"
     
     let title: UILabel = {
         let label = UILabel()
@@ -41,8 +41,8 @@ class GameCollectionViewCell: UICollectionViewCell {
         title.frame = contentView.bounds
         button.frame = contentView.bounds
     }
-    public func configure(with g: GameModel) {
-        title.text = g.name
+    public func configure(with u: [UserModel]) {
+        
     }
     
     private func setUpConstraints() {

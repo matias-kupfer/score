@@ -212,7 +212,7 @@ class AddGameViewController: UIViewController {
     }
     
     @objc private func onSaveTask() {
-        let gameObject = GameModel(name: nameInputField.text!, id: "id", users: self.users, color: gameColor!)
+        let gameObject = GameModel(name: nameInputField.text!, description: desciptionInputField.text!, id: "id", users: self.users, color: gameColor!)
         let gamesRef = db.collection("games")
         do {
             let gameRef: DocumentReference = try gamesRef.addDocument(from: gameObject)
