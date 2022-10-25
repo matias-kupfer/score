@@ -89,12 +89,12 @@ class HomeViewController: UIViewController {
             print("user is logged in: " + auth.currentUser!.uid)
             getGames()
         }
-//        else {
-//            let vc = LoginViewController()
-//            let nc = UINavigationController(rootViewController: vc)
-//            nc.modalPresentationStyle = .fullScreen
-//            navigationController?.present(nc, animated: false)
-//        }
+        //        else {
+        //            let vc = LoginViewController()
+        //            let nc = UINavigationController(rootViewController: vc)
+        //            nc.modalPresentationStyle = .fullScreen
+        //            navigationController?.present(nc, animated: false)
+        //        }
         setUpConstraints()
     }
     
@@ -203,20 +203,12 @@ class HomeViewController: UIViewController {
     private func searchUser(userId: String) -> Promise<UserModel>{
         let usersRef = db.collection("users").whereField("id", isEqualTo: userId).limit(to: 1)
         let promise = Promise<UserModel> { (resolve, reject) in
-            usersRef.getDocuments() { (querySnapshot, err) in
-                if let err = err {
-                    print("Error getting documents: \(err)")
-                    return
+            let usersRef = self.db.collection("users").document(userId)
+            usersRef.getDocument { (document, error) in
+                if(error != nil) {
+                    print(error)
                 } else {
-                    guard let documents: [QueryDocumentSnapshot] = querySnapshot?.documents else {
-                        reject(NSError(domain: "user not found", code: 404, userInfo: nil))
-                        return
-                    }
-                    if (documents.count == 0) {
-                        print("no documents")
-                        return
-                    }
-                    resolve(try! documents.first!.data(as: UserModel.self))
+                    resolve(try! document!.data(as: UserModel.self))
                 }
             }
         }

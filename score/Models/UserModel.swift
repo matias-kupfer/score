@@ -12,3 +12,8 @@ struct UserModel: Codable {
     let name: String;
     let username: String
 }
+
+struct UserModelInfo: Codable {
+    let user: UserModel
+    let wins: Int
+}

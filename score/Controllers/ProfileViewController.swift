@@ -34,7 +34,9 @@ class ProfileViewController: UIViewController {
     }()
     
     let table: UITableView = {
-        let table = UITableView()
+        let table = UITableView.init(frame: .zero)
+        table.translatesAutoresizingMaskIntoConstraints = false
+        table.rowHeight = UITableView.automaticDimension
         table.register(GameTableViewCell.self, forCellReuseIdentifier: GameTableViewCell.identifier)
         return table
     }()
@@ -56,7 +58,7 @@ class ProfileViewController: UIViewController {
         table.tableHeaderView = profileHeaderUIView
         table.delegate = self
         table.dataSource = self
-        
+        table.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         getGames()
         
     }
@@ -67,13 +69,17 @@ class ProfileViewController: UIViewController {
     }
     
     private func setUpConstraints() {
-        var constraints = [NSLayoutConstraint]()
         let margins = view.layoutMarginsGuide
         
-        constraints.append(profileHeaderUIView.leadingAnchor.constraint(equalTo: margins.leadingAnchor))
-        constraints.append(profileHeaderUIView.trailingAnchor.constraint(equalTo: margins.trailingAnchor))
-        
-        NSLayoutConstraint.activate(constraints)
+        NSLayoutConstraint.activate([
+//            profileHeaderUIView.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
+//            profileHeaderUIView.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
+            
+            table.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            table.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            table.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            table.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
     
     private func getGames() {
@@ -159,10 +165,18 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
+        func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+            return UITableView.automaticDimension
+        }
     
+        func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+            return UITableView.automaticDimension
+        }
+    //
+    //    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    //        cell.layoutIfNeeded()
+    //    }
+    //
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = GameViewController()
         vc.gameViewControllerDelegate = self

@@ -10,25 +10,15 @@ import UIKit
 class GameUsersCollectionViewCell: UICollectionViewCell {
     static let identifier = "GameUsersCollectionViewCell"
     
-    let title: UILabel = {
+    let winner: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .red
-        label.text = "fjkdslfs"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let button: UIButton = {
-        let button = UIButton()
-        button.setTitle("dsfklsdf", for: .normal)
-        button.contentMode = .scaleToFill
-        return button
-    }()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(title)
-        contentView.addSubview(button)
+        contentView.addSubview(winner)
         setUpConstraints()
     }
     
@@ -38,21 +28,17 @@ class GameUsersCollectionViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        title.frame = contentView.bounds
-        button.frame = contentView.bounds
+        winner.frame = contentView.bounds
     }
-    public func configure(with u: [UserModel]) {
-        
+    public func configure(u: UserModelInfo, c: UIColor) {
+        winner.text = u.user.name + " x" + String(u.wins)
+        winner.textColor = c
     }
     
+    let padding: CGFloat = 5
     private func setUpConstraints() {
-        var constraints = [NSLayoutConstraint]()
+        NSLayoutConstraint.activate([
         
-        constraints.append(title.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor))
-        constraints.append(title.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20))
-        constraints.append(title.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20))
-        title.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        
-        NSLayoutConstraint.activate(constraints)
+        ])
     }
 }
