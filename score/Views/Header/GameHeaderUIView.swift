@@ -27,7 +27,7 @@ class GameHeaderUIView: UIView {
     
     public func configure(game: GameModel, users: [UserModel]) {
         usersLabel.text = (users.compactMap { user -> String in
-            return user.name
+            return user.username
         }).joined(separator:", ")
         let c = game.color
         backgroundColor = UIColor(red: c.red, green: c.green, blue: c.blue, alpha: c.alpha)

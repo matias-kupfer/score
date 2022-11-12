@@ -16,6 +16,7 @@ protocol AddGameViewControllerDelegate: AnyObject {
 
 class AddGameViewController: UIViewController {
     let db = Firestore.firestore()
+    let auth = FirebaseAuth.Auth.auth()
     
     var gameColor: GameColorModel?
     
@@ -212,8 +213,10 @@ class AddGameViewController: UIViewController {
     }
     
     @objc private func onSaveTask() {
+        self.users.append(auth.currentUser!.uid)
         let gameObject = GameModel(name: nameInputField.text!, description: desciptionInputField.text!, id: "id", users: self.users, color: gameColor!)
         let gamesRef = db.collection("games")
+        print(self.users)
         do {
             let gameRef: DocumentReference = try gamesRef.addDocument(from: gameObject)
             gameRef.updateData(["id": gameRef.documentID]) { (error: Error?) in

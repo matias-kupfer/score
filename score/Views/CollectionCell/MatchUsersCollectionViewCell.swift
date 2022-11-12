@@ -52,7 +52,7 @@ class MatchUsersCollectionViewCell: UICollectionViewCell {
         default:
             button.backgroundColor = .systemBlue
         }
-        button.setTitle(user.name, for: .normal)
+        button.setTitle(user.username, for: .normal)
     }
     
 }

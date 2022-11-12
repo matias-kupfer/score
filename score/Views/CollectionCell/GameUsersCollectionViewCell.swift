@@ -31,7 +31,7 @@ class GameUsersCollectionViewCell: UICollectionViewCell {
         winner.frame = contentView.bounds
     }
     public func configure(u: UserModelInfo, c: UIColor) {
-        winner.text = u.user.name + " x" + String(u.wins)
+        winner.text = u.user.username + " x" + String(u.wins)
         winner.textColor = c
     }
     

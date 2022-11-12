@@ -265,8 +265,12 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     
     @objc func onRefresh() {
         print("refresh table")
-        getGameUsers()
-        getMatches()
+        if (self.selectedGame == nil) {
+            getGames()
+        } else {
+            getGameUsers()
+            getMatches()
+        }
         refreshControl.endRefreshing()
     }
 }
