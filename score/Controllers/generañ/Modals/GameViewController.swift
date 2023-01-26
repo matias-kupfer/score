@@ -20,11 +20,18 @@ class GameViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         view.addSubview(titleLabel)
+        view.addSubview(descriptionLabel)
         setUpConstraints()
     }
     
@@ -34,16 +41,18 @@ class GameViewController: UIViewController {
 
     public func configure(g: GameModel) {
         titleLabel.text = g.name
+        descriptionLabel.text = g.description
     }
     
     private func setUpConstraints() {
-        var constraints = [NSLayoutConstraint]()
-        
-        //        constraints.append(dateLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20))
-        constraints.append(titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20))
         titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            descriptionLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor)
+        ])
         
-        NSLayoutConstraint.activate(constraints)
+        
     }
 
 }

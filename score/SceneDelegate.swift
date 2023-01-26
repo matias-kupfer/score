@@ -22,7 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             if user != nil {
                 self.window?.rootViewController = TabBarViewController()
             } else {
-                self.window?.rootViewController = LoginViewController()
+                self.window?.rootViewController = UINavigationController(rootViewController:LoginViewController())
             }
         }
         window?.makeKeyAndVisible()

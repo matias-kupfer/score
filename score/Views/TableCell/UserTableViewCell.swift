@@ -69,7 +69,7 @@ class UserTableViewCell: UITableViewCell {
     }
     
     public func configure(with user: UserModel) {
-        label.text = user.name
+        label.text = user.username
         iconImageView.image = UIImage(systemName: "list.number")
         iconContainer.backgroundColor = .systemPink
     }

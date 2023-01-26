@@ -15,7 +15,15 @@ class ProfileViewController: UIViewController {
     let auth = FirebaseAuth.Auth.auth()
     let db: Firebase.Firestore = Firestore.firestore()
     var games = [GameModel]()
+    var user: UserModel!
     private var profileHeaderUIView: ProfileHeaderUIView!
+    
+    func getUser() {
+        if let data = UserDefaults.standard.data(forKey: "user"),
+           let userModel = try? JSONDecoder().decode(UserModel.self, from: data) {
+            user = userModel
+        }
+    }
     
     let leftNavigationButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
@@ -55,12 +63,13 @@ class ProfileViewController: UIViewController {
         profileHeaderUIView = ProfileHeaderUIView()
         profileHeaderUIView.translatesAutoresizingMaskIntoConstraints = false
         
+        getUser()
+        getGames()
+        
         table.tableHeaderView = profileHeaderUIView
         table.delegate = self
         table.dataSource = self
         table.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        getGames()
-        
     }
     
     override func viewDidLayoutSubviews() {
@@ -72,8 +81,8 @@ class ProfileViewController: UIViewController {
         let margins = view.layoutMarginsGuide
         
         NSLayoutConstraint.activate([
-//            profileHeaderUIView.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
-//            profileHeaderUIView.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
+            //            profileHeaderUIView.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
+            //            profileHeaderUIView.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
             
             table.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -81,6 +90,7 @@ class ProfileViewController: UIViewController {
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
+    
     
     private func getGames() {
         //        activityIndicator.startAnimating()
@@ -106,7 +116,8 @@ class ProfileViewController: UIViewController {
                 }
                 self.view.addSubview(self.table)
                 self.setUpConstraints()
-                self.profileHeaderUIView.configure(g: self.games)
+                print(self.user)
+                self.profileHeaderUIView.configure(g: self.games, u: self.user)
                 self.table.reloadData()
                 //                self.activityIndicator.stopAnimating()
                 //                self.navigationItem.leftBarButtonItem = self.leftNavigationButton
@@ -119,6 +130,7 @@ class ProfileViewController: UIViewController {
         print("onlogoutclick")
         do {
             try auth.signOut()
+            UserDefaults.standard.removeObject(forKey: "user")
             print("user logged out")
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
@@ -165,13 +177,13 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
-        func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-            return UITableView.automaticDimension
-        }
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
     
-        func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-            return UITableView.automaticDimension
-        }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
     //
     //    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     //        cell.layoutIfNeeded()

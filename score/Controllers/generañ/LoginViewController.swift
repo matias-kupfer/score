@@ -9,6 +9,7 @@ import UIKit
 import FirebaseAuth
 import Firebase
 import FirebaseFirestoreSwift
+import Promises
 
 class LoginViewController: UIViewController {
     
@@ -28,6 +29,7 @@ class LoginViewController: UIViewController {
         let input = UITextField()
         input.placeholder = "Email"
         input.text = "register@score.com"
+        input.textColor = .lightGray
         input.translatesAutoresizingMaskIntoConstraints = false
         input.font = UIFont.systemFont(ofSize: 24)
         input.borderStyle = .none
@@ -42,6 +44,7 @@ class LoginViewController: UIViewController {
     let passwordInputField: UITextField = {
         let input = UITextField()
         input.text = "qwerty"
+        input.textColor = .lightGray
         input.placeholder = "******"
         input.translatesAutoresizingMaskIntoConstraints = false
         input.font = UIFont.systemFont(ofSize: 24)
@@ -75,6 +78,7 @@ class LoginViewController: UIViewController {
     let usernameInputField: UITextField = {
         let input = UITextField()
         input.text = ""
+        input.textColor = .lightGray
         input.placeholder = "username"
         input.translatesAutoresizingMaskIntoConstraints = false
         input.font = UIFont.systemFont(ofSize: 24)
@@ -112,10 +116,11 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("viewDidLoad LoginViewController")
         
+        self.view.backgroundColor = .systemBackground
+        print("viewDidLoad LoginViewController")
         navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Login"
+        title = "Login/Register"
         
         headerLabel.text = defaultText
         
@@ -164,7 +169,7 @@ class LoginViewController: UIViewController {
             } else {
                 print(authResult!.user)
                 print("logged in")
-                self?.dismiss(animated: true)
+                self!.searchUser(userId: authResult!.user.uid)
             }
         }
     }
@@ -180,13 +185,31 @@ class LoginViewController: UIViewController {
                 do {
                     self.db.collection("users").document(authResult!.user.uid).setData([
                         "id": authResult!.user.uid,
-                        "name": authResult!.user.email,
+                        "email": authResult!.user.email,
                         "username": self.usernameInputField.text!
                     ])
                 } catch let error {
                     print("Error writing city to Firestore: \(error)")
                 }
-                self.dismiss(animated: true)
+                self.searchUser(userId: authResult!.user.uid)
+            }
+        }
+    }
+    
+    private func searchUser(userId: String) -> Void{
+        let docRef = db.collection("users").document(userId)
+        docRef.getDocument(source: .cache) { (document, error) in
+            if let document = document {
+                let encoder = JSONEncoder()
+                if let user = try! document.data(as: UserModel?.self) {
+                    let encoder = JSONEncoder()
+                    if let encoded = try? encoder.encode(user) {
+                        UserDefaults.standard.set(encoded, forKey: "user")
+                        self.dismiss(animated: true)
+                    }
+                }
+            } else {
+                print("Document does not exist in cache")
             }
         }
     }

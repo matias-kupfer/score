@@ -116,6 +116,8 @@ class HomeViewController: UIViewController {
     private func getGames() {
         activityIndicator.startAnimating()
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: activityIndicator)
+        games = [GameModel]()
+        selectedGame = nil
         let gamesRef = db.collection("games")
         gamesRef.getDocuments() { (querySnapshot, err) in
             if let err = err {

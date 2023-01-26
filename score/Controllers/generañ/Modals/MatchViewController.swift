@@ -106,13 +106,13 @@ class MatchViewController: UIViewController {
             }
         }
         // set winner names
-        winnerLabel.text = orderedGameUsers[0].name.uppercased()
-        secondLabel.text = orderedGameUsers[1].name.uppercased()
-        thirdLabel.text = orderedGameUsers[2].name.uppercased()
+        winnerLabel.text = orderedGameUsers[0].username
+        secondLabel.text = orderedGameUsers[1].username
+        thirdLabel.text = orderedGameUsers[2].username
         
         if (orderedGameUsers.count > 3) {
             for i in 3...(orderedGameUsers.count - 1) {
-                playersLabel.text = playersLabel.text ?? "" + " - " + orderedGameUsers[i].name
+                playersLabel.text = playersLabel.text ?? "" + " - " + orderedGameUsers[i].username
             }
         }
     }

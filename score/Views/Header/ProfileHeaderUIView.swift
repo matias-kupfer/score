@@ -22,8 +22,8 @@ class ProfileHeaderUIView: UIView {
         addSubview(text)
     }
     
-    public func configure(g: [GameModel]) {
-        text.text = "You have a total of " + String(g.count) + " games."
+    public func configure(g: [GameModel], u: UserModel) {
+        text.text = "Welcome " + u.username + ", You have a total of " + String(g.count) + " games."
     }
     
     override func layoutSubviews() {
