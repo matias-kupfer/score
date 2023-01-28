@@ -7,7 +7,6 @@
 
 import UIKit
 import SwiftUI
-import Firebase
 
 protocol MatchUIViewControllerDelegate: AnyObject {
     func onDeleteMatch(match: MatchModel)
@@ -18,7 +17,6 @@ class MatchViewController: UIViewController {
     public var matchUIViewControllerDelegate: MatchUIViewControllerDelegate!
     private var match: MatchModel!
     private var game: GameModel!
-    private var db: Firebase.Firestore!
     
     
     let dateLabel: UILabel = {
@@ -85,7 +83,7 @@ class MatchViewController: UIViewController {
         setUpConstraints()
     }
     
-    public func configure(g: GameModel, m: MatchModel, users: [UserModel], db: Firebase.Firestore) {
+    public func configure(g: GameModel, m: MatchModel, users: [UserModel]) {
         let myTimeInterval = TimeInterval(m.date)
         let formatter = DateFormatter()
         formatter.dateFormat = "dd-MM-yyyy"
@@ -93,7 +91,6 @@ class MatchViewController: UIViewController {
         
         game = g
         match = m
-        self.db = db
         
         orderUsers(m: m, u: users)
     }
@@ -149,10 +146,9 @@ class MatchViewController: UIViewController {
     }
     
     @objc private func onDeleteMatch() {
-        let matchRef = db.collection("games").document(game.id).collection("matches").document(match.id)
-        matchRef.delete() { (err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
+        FirebaseService.shared.deleteMatch(gameId: game.id, matchId: match.id) {(error: Error?) in
+            if let error = error {
+                print("Error getting documents: \(error)")
             } else {
                 self.matchUIViewControllerDelegate.onDeleteMatch(match: self.match)
                 self.dismiss(animated: true)

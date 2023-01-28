@@ -6,12 +6,8 @@
 //
 
 import UIKit
-import Firebase
-import FirebaseFirestoreSwift
 
 class AddMatchViewController: UIViewController {
-    
-    let db = Firestore.firestore()
     
     var gameUsers: [UserModel]!
     var game: GameModel!
@@ -69,19 +65,17 @@ class AddMatchViewController: UIViewController {
             return user.id
         }
         let match = MatchModel(id: "null", date: NSDate().timeIntervalSince1970, order: usersIds)
-        let matchRef = db.collection("games").document(game.id).collection("matches")
-        do {
-            let matchRef: DocumentReference = try matchRef.addDocument(from: match)
-            matchRef.updateData(["id": matchRef.documentID]) { (error: Error?) in
-                if let error = error {
-                    print("Data could not be saved: \(error).")
-                } else {
+        FirebaseService.shared.saveMatch(gameId: "gameId", match: match) { error, matchRef in
+            if let error = error {
+                print("Error adding match: \(error)")
+            } else {
+                if let matchRef = matchRef {
+                    print("Match added with ID: \(matchRef.documentID)")
                     self.dismiss(animated: true, completion: nil)
                 }
             }
-        } catch let error {
-            print("Error writing city to Firestore: \(error)")
         }
+
     }
     
     private func setUpConstraints() {

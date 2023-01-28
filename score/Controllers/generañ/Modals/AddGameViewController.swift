@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import Firebase
-import FirebaseFirestoreSwift
 import SwiftUI
 
 protocol AddGameViewControllerDelegate: AnyObject {
@@ -15,8 +13,6 @@ protocol AddGameViewControllerDelegate: AnyObject {
 }
 
 class AddGameViewController: UIViewController {
-    let db = Firestore.firestore()
-    let auth = FirebaseAuth.Auth.auth()
     
     var gameColor: GameColorModel?
     
@@ -49,7 +45,7 @@ class AddGameViewController: UIViewController {
         var button = UIBarButtonItem()
         button.title = "Save"
         button.style = UIBarButtonItem.Style.plain
-        button.action = #selector(onSaveTask)
+        button.action = #selector(onSaveGame)
         button.tintColor = .systemBlue
         return button
     }()
@@ -106,8 +102,8 @@ class AddGameViewController: UIViewController {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "send.png"), for: .normal)
         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -16, bottom: 0, right: 0)
-//        button.frame = CGRect(x: CGFloat(txt.frame.size.width - 25), y: CGFloat(5), width: CGFloat(25), height: CGFloat(25))
-//        button.addTarget(self, action: #selector(self.refresh), for: .touchUpInside)
+        //        button.frame = CGRect(x: CGFloat(txt.frame.size.width - 25), y: CGFloat(5), width: CGFloat(25), height: CGFloat(25))
+        //        button.addTarget(self, action: #selector(self.refresh), for: .touchUpInside)
         return button
     }()
     
@@ -185,49 +181,34 @@ class AddGameViewController: UIViewController {
     }
     
     @objc private func searchUser(_ textField: UITextField) {
-        let usersRef = db.collection("users").whereField("username", isEqualTo: textField.text!).limit(to: 1)
-        usersRef.getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                guard let documents: [QueryDocumentSnapshot] = querySnapshot?.documents else {
-                    return
-                }
-                if (documents.count == 0) {
-                    print("no documents")
-                    return
-                }
-                let user: UserModel = try! documents.first!.data(as: UserModel.self)
-                if (self.users.contains(user.id)) {
-                    return
-                }
+        FirebaseService.shared.searchUserByUsername(username: textField.text!) { (user, error) in
+            if let user = user {
                 self.users.append(user.id)
                 self.userCardView.configure(with: user)
+            } else if let error = error {
+                print(error)
+            } else {
+                print("User not found")
             }
         }
-        
     }
     
     @objc private func onCancel() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc private func onSaveTask() {
-        self.users.append(auth.currentUser!.uid)
-        let gameObject = GameModel(name: nameInputField.text!, description: desciptionInputField.text!, id: "id", users: self.users, color: gameColor!)
-        let gamesRef = db.collection("games")
-        print(self.users)
-        do {
-            let gameRef: DocumentReference = try gamesRef.addDocument(from: gameObject)
-            gameRef.updateData(["id": gameRef.documentID]) { (error: Error?) in
-                if let error = error {
-                    print("Data could not be saved: \(error).")
-                } else {
+    @objc private func onSaveGame() {
+        self.users.append(AuthService.shared.getAuthUserId())
+        let gameObject = GameModel(name: nameInputField.text!, description: desciptionInputField.text!, id: "id", players: self.users, color: gameColor!)
+        FirebaseService.shared.saveGame(game: gameObject) { error, gameRef in
+            if let error = error {
+                print("Error adding game: \(error)")
+            } else {
+                if let gameRef = gameRef {
+                    print("Game added with ID: \(gameRef.documentID)")
                     self.dismiss(animated: true, completion: nil)
                 }
             }
-        } catch let error {
-            print("Error writing city to Firestore: \(error)")
         }
     }
 }

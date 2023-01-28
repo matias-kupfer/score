@@ -12,7 +12,7 @@ struct GameModel: Codable {
     var name: String
     var description: String
     var id: String
-    var users: [String]
+    var players: [String]
     var color: GameColorModel
 }
 

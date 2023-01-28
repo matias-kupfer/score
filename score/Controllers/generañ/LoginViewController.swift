@@ -6,16 +6,9 @@
 //
 
 import UIKit
-import FirebaseAuth
-import Firebase
-import FirebaseFirestoreSwift
-import Promises
 
 class LoginViewController: UIViewController {
-    
-    let auth = FirebaseAuth.Auth.auth()
-    let db: Firebase.Firestore = Firestore.firestore()
-    
+        
     let defaultText: String = "Login to see your profile"
     
     let headerLabel: UILabel = {
@@ -163,54 +156,48 @@ class LoginViewController: UIViewController {
     }
     
     @objc private func onLoginClick(_: AnyObject) {
-        auth.signIn(withEmail: emailInputField.text!, password: passwordInputField.text!) { [weak self] authResult, error in
-            if (error != nil) {
+        AuthService.shared.signIn(email: emailInputField.text!, password: passwordInputField.text!) { authResult, error in
+            if let error = error {
                 print(error)
             } else {
-                print(authResult!.user)
-                print("logged in")
-                self!.searchUser(userId: authResult!.user.uid)
+                FirebaseService.shared.getUserById(userId: authResult!.user.uid) { user in
+                    if let user {
+                        print("got user data after login")
+                        self.storeUser(user: user)
+                    } else {
+                        print("user not found")
+                    }
+                }
             }
         }
     }
     
     @objc private func onRegisterClick(_: AnyObject) {
-        auth.createUser(withEmail: emailInputField.text!, password: passwordInputField.text!) { authResult, error in
-            if (error != nil) {
+        AuthService.shared.createUser(email: emailInputField.text!, password: passwordInputField.text!) { authResult, error in
+            if let error = error {
                 print(error)
             } else {
-                print(authResult!.user)
-                print("registered")
-                print(authResult?.user.uid)
-                do {
-                    self.db.collection("users").document(authResult!.user.uid).setData([
-                        "id": authResult!.user.uid,
-                        "email": authResult!.user.email,
-                        "username": self.usernameInputField.text!
-                    ])
-                } catch let error {
-                    print("Error writing city to Firestore: \(error)")
+                let user = UserModel(id: authResult!.user.uid, email: authResult!.user.email!, username: self.usernameInputField.text!)
+                FirebaseService.shared.saveUser(user: user) { error in
+                    if let error = error {
+                        print("error setting user: \(error)")
+                    } else {
+                        self.storeUser(user: user)
+                        self.dismiss(animated: true)
+                    }
                 }
-                self.searchUser(userId: authResult!.user.uid)
             }
         }
     }
     
-    private func searchUser(userId: String) -> Void{
-        let docRef = db.collection("users").document(userId)
-        docRef.getDocument(source: .cache) { (document, error) in
-            if let document = document {
-                let encoder = JSONEncoder()
-                if let user = try! document.data(as: UserModel?.self) {
-                    let encoder = JSONEncoder()
-                    if let encoded = try? encoder.encode(user) {
-                        UserDefaults.standard.set(encoded, forKey: "user")
-                        self.dismiss(animated: true)
-                    }
-                }
-            } else {
-                print("Document does not exist in cache")
-            }
+    private func storeUser(user: UserModel) -> Void {
+        print("store in login")
+        print(user)
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(user) {
+            print("encoded")
+            print(user)
+            UserDefaults.standard.set(encoded, forKey: "user")
         }
     }
 }

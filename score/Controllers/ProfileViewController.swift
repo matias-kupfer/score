@@ -6,24 +6,12 @@
 //
 
 import UIKit
-import Firebase
-import FirebaseAuth
-import FirebaseFirestoreSwift
 
 class ProfileViewController: UIViewController {
     
-    let auth = FirebaseAuth.Auth.auth()
-    let db: Firebase.Firestore = Firestore.firestore()
     var games = [GameModel]()
     var user: UserModel!
     private var profileHeaderUIView: ProfileHeaderUIView!
-    
-    func getUser() {
-        if let data = UserDefaults.standard.data(forKey: "user"),
-           let userModel = try? JSONDecoder().decode(UserModel.self, from: data) {
-            user = userModel
-        }
-    }
     
     let leftNavigationButton: UIBarButtonItem = {
         let button = UIBarButtonItem()
@@ -63,8 +51,12 @@ class ProfileViewController: UIViewController {
         profileHeaderUIView = ProfileHeaderUIView()
         profileHeaderUIView.translatesAutoresizingMaskIntoConstraints = false
         
-        getUser()
-        getGames()
+        
+        if let data = UserDefaults.standard.data(forKey: "user"),
+           let userModel = try? JSONDecoder().decode(UserModel.self, from: data) {
+            user = userModel
+            getGames()
+        }
         
         table.tableHeaderView = profileHeaderUIView
         table.delegate = self
@@ -95,45 +87,23 @@ class ProfileViewController: UIViewController {
     private func getGames() {
         //        activityIndicator.startAnimating()
         //        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: activityIndicator)
-        let gamesRef = db.collection("games")
-        gamesRef.getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                guard let documents = querySnapshot?.documents else {
-                    return
-                }
-                if (documents.count == 0) {
-                    print("no documents")
-                    //                    self.activityIndicator.stopAnimating()
-                    return
-                }
-                for document in documents {
-                    let game: GameModel = try! document.data(as: GameModel.self)
-                    if (game.users.contains(self.auth.currentUser!.uid)) {
-                        self.games.append(game)
-                    }
-                }
-                self.view.addSubview(self.table)
-                self.setUpConstraints()
-                print(self.user)
-                self.profileHeaderUIView.configure(g: self.games, u: self.user)
-                self.table.reloadData()
-                //                self.activityIndicator.stopAnimating()
-                //                self.navigationItem.leftBarButtonItem = self.leftNavigationButton
-                //                self.configureMenu()
-            }
+        FirebaseService.shared.getGamesByUserId(userId: user.id) { games in
+            self.games = games
+            self.view.addSubview(self.table)
+            self.setUpConstraints()
+            self.profileHeaderUIView.configure(g: self.games, u: self.user)
+            self.table.reloadData()
         }
     }
     
     @objc private func onLogoutClick() {
-        print("onlogoutclick")
-        do {
-            try auth.signOut()
-            UserDefaults.standard.removeObject(forKey: "user")
-            print("user logged out")
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError)
+        AuthService.shared.signOut { error in
+            if let error = error {
+                print("error on sign out: \(error)")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "user")
+                print("user logged out")
+            }
         }
     }
 }

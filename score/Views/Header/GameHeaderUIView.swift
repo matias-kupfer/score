@@ -6,12 +6,9 @@
 //
 
 import UIKit
-import FirebaseAuth
 
 class GameHeaderUIView: UIView {
     
-    let auth = FirebaseAuth.Auth.auth()
-
     let usersLabel: UILabel = {
         let label = UILabel()
         label.text = "Welcome! Select a game to see more."

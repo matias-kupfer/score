@@ -7,15 +7,9 @@
 
 import UIKit
 import Firebase
-import FirebaseAuth
-import FirebaseFirestoreSwift
-import Promises
-
 
 class HomeViewController: UIViewController {
     
-    let auth = FirebaseAuth.Auth.auth()
-    let db: Firebase.Firestore = Firestore.firestore()
     
     var games = [GameModel]()
     var selectedGame: GameModel!
@@ -85,10 +79,8 @@ class HomeViewController: UIViewController {
         table.dataSource = self
         view.addSubview(table)
         
-        if (auth.currentUser?.uid != nil) {
-            print("user is logged in: " + auth.currentUser!.uid)
-            getGames()
-        }
+    
+        getGames()
         //        else {
         //            let vc = LoginViewController()
         //            let nc = UINavigationController(rootViewController: vc)
@@ -118,32 +110,15 @@ class HomeViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: activityIndicator)
         games = [GameModel]()
         selectedGame = nil
-        let gamesRef = db.collection("games")
-        gamesRef.getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                guard let documents = querySnapshot?.documents else {
-                    return
-                }
-                if (documents.count == 0) {
-                    print("no documents")
-                    self.activityIndicator.stopAnimating()
-                    return
-                }
-                for document in documents {
-                    let game: GameModel = try! document.data(as: GameModel.self)
-                    if (game.users.contains(self.auth.currentUser!.uid)) {
-                        self.games.append(game)
-                    }
-                }
-                self.activityIndicator.stopAnimating()
-                self.navigationItem.leftBarButtonItem = self.leftNavigationButton
-                if (!self.games.isEmpty) {
-                    self.navigationItem.leftBarButtonItem?.isEnabled = true
-                }
-                self.configureMenu()
+        
+        FirebaseService.shared.getGamesByUserId(userId: AuthService.shared.getAuthUserId()) { games in
+            self.activityIndicator.stopAnimating()
+            self.navigationItem.leftBarButtonItem = self.leftNavigationButton
+            self.games = games
+            if (!self.games.isEmpty) { // check if there are games to enable the games selector nav button
+                self.navigationItem.leftBarButtonItem?.isEnabled = true
             }
+            self.configureMenu()
         }
     }
     
@@ -168,53 +143,18 @@ class HomeViewController: UIViewController {
     
     private func getGameUsers() {
         selectedGameUsers.removeAll()
-        // loop that waits to proceed?
-        for userId in selectedGame.users {
-            searchUser(userId: userId).then{(user: UserModel) in
-                self.selectedGameUsers.append(user)
-                self.gameHeaderUIView?.configure(game: self.selectedGame, users: self.selectedGameUsers)
-                self.table.reloadData()
-            }.catch{(err: Error) in
-                print(err)
-            }
+        FirebaseService.shared.getGameUsers(usersIds: selectedGame.players) { users in
+            self.selectedGameUsers = users
+            self.gameHeaderUIView?.configure(game: self.selectedGame, users: self.selectedGameUsers)
+            self.table.reloadData()
         }
     }
     
     private func getMatches() {
-        matches = []
-        let matchesRef = db.collection("games").document(selectedGame.id).collection("matches").order(by: "date", descending: true)
-        matchesRef.getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                guard let documents = querySnapshot?.documents else {
-                    return
-                }
-                if (documents.count == 0) {
-                    print("no documents")
-                    return
-                }
-                self.matches = documents.compactMap { queryDocumentSnapshot -> MatchModel? in
-                    return try! queryDocumentSnapshot.data(as: MatchModel.self)
-                }
-                self.table.reloadData()
-            }
+        matches.removeAll()
+        FirebaseService.shared.getMatches(gameId: selectedGame.id) { matches in
+            self.matches = matches
         }
-    }
-    
-    private func searchUser(userId: String) -> Promise<UserModel>{
-        let usersRef = db.collection("users").whereField("id", isEqualTo: userId).limit(to: 1)
-        let promise = Promise<UserModel> { (resolve, reject) in
-            let usersRef = self.db.collection("users").document(userId)
-            usersRef.getDocument { (document, error) in
-                if(error != nil) {
-                    print(error)
-                } else {
-                    resolve(try! document!.data(as: UserModel.self))
-                }
-            }
-        }
-        return promise
     }
     
     private func changeColor() {
@@ -281,7 +221,7 @@ extension HomeViewController: SectionHeaderUIViewControllerDelegate {
     func onMatchTap(match: MatchModel) {
         let vc = MatchViewController()
         vc.matchUIViewControllerDelegate = self
-        vc.configure(g: selectedGame, m: match, users: selectedGameUsers, db: db)
+        vc.configure(g: selectedGame, m: match, users: selectedGameUsers)
         let nc = UINavigationController(rootViewController: vc)
         nc.modalPresentationStyle = .pageSheet
         nc.sheetPresentationController?.detents = [.medium()]

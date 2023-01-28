@@ -6,16 +6,11 @@
 //
 
 import UIKit
-import Firebase
-import FirebaseAuth
-import FirebaseFirestoreSwift
-import Promises
 
 class GameTableViewCell: UITableViewCell {
     
     static let identifier = "GameTableViewCell"
     
-    let db: Firebase.Firestore = Firestore.firestore()
     var usersInfo: [UserModelInfo] = [UserModelInfo]()
     var game: GameModel!
     var winnersCount: Int?;
@@ -37,14 +32,14 @@ class GameTableViewCell: UITableViewCell {
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-//        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-//        layout.itemSize = UICollectionViewFlowLayout.automaticSize
+        //        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        //        layout.itemSize = UICollectionViewFlowLayout.automaticSize
         layout.scrollDirection = .horizontal
-//        let layout = UICollectionViewFlowLayout()
+        //        let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 100, height: 100)
-//        layout.scrollDirection = .horizontal
+        //        layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-//        collectionView.backgroundColor = .systemPink
+        //        collectionView.backgroundColor = .systemPink
         collectionView.register(GameUsersCollectionViewCell.self, forCellWithReuseIdentifier: GameUsersCollectionViewCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -100,7 +95,7 @@ class GameTableViewCell: UITableViewCell {
             descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
             descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
             descriptionLabel.bottomAnchor.constraint(equalTo: collectionView.topAnchor),
-
+            
             collectionView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -109,24 +104,8 @@ class GameTableViewCell: UITableViewCell {
     }
     
     private func getMatches() {
-        let matchesRef = db.collection("games").document(game.id).collection("matches").order(by: "date", descending: true)
-        matchesRef.getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                guard let documents = querySnapshot?.documents else {
-                    return
-                }
-                if (documents.count == 0) {
-                    print("no documents game table view cell")
-                    return
-                }
-                var matches: [MatchModel] = []
-                matches.append(contentsOf: documents.compactMap { queryDocumentSnapshot -> MatchModel? in
-                    return try! queryDocumentSnapshot.data(as: MatchModel.self)
-                })
-                self.countMatchWinners(matches: matches)
-            }
+        FirebaseService.shared.getMatches(gameId: game.id) { matches in
+            self.countMatchWinners(matches: matches)
         }
     }
     
@@ -143,15 +122,14 @@ class GameTableViewCell: UITableViewCell {
     }
     
     private func searchUser(userId: String, wins: Int){
-        let usersRef = db.collection("users").document(userId)
-        usersRef.getDocument { [self] (document, error) in
-            if let document = document, document.exists {
-                self.usersInfo.append(UserModelInfo(user: try! document.data(as: UserModel.self), wins: wins))
+        FirebaseService.shared.getUserById(userId: userId) { (user: UserModel?) in
+            if let user = user {
+                self.usersInfo.append(UserModelInfo(user: user, wins: wins))
                 if (self.winnersCount == self.usersInfo.count) {
                     self.collectionView.reloadData()
                 }
             } else {
-                print("User not found")
+                print("user not found")
             }
         }
     }
@@ -169,8 +147,8 @@ extension GameTableViewCell: UICollectionViewDelegate, UICollectionViewDataSourc
         cell.configure(u: self.usersInfo[indexPath.row], c: self.color)
         return cell
     }
-//
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        return CGSize(width: collectionView.frame.width/5, height: 150)
-//    }
+    //
+    //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    //        return CGSize(width: collectionView.frame.width/5, height: 150)
+    //    }
 }

@@ -20,6 +20,8 @@
 		7547DAD028006D43004D7564 /* UserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7547DACF28006D43004D7564 /* UserTableViewCell.swift */; };
 		755C86C028BFC92E00DB93EC /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 755C86BF28BFC92E00DB93EC /* FirebaseAuth */; };
 		7570B37028B6388300A4AA40 /* MatchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7570B36F28B6388300A4AA40 /* MatchViewController.swift */; };
+		759D7ABD2983EB5A004DB5FE /* FirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759D7ABC2983EB5A004DB5FE /* FirestoreService.swift */; };
+		759D7ABF2985633D004DB5FE /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 759D7ABE2985633D004DB5FE /* AuthService.swift */; };
 		75B486A627F1D6BD003DE9DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486A527F1D6BD003DE9DD /* AppDelegate.swift */; };
 		75B486A827F1D6BD003DE9DD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B486A727F1D6BD003DE9DD /* SceneDelegate.swift */; };
 		75B486AF27F1D6BD003DE9DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 75B486AE27F1D6BD003DE9DD /* Assets.xcassets */; };
@@ -49,6 +51,8 @@
 		7547DACD27F9E771004D7564 /* AddMatchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMatchViewController.swift; sourceTree = "<group>"; };
 		7547DACF28006D43004D7564 /* UserTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTableViewCell.swift; sourceTree = "<group>"; };
 		7570B36F28B6388300A4AA40 /* MatchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchViewController.swift; sourceTree = "<group>"; };
+		759D7ABC2983EB5A004DB5FE /* FirestoreService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirestoreService.swift; sourceTree = "<group>"; };
+		759D7ABE2985633D004DB5FE /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		75B486A227F1D6BD003DE9DD /* score.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = score.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75B486A527F1D6BD003DE9DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		75B486A727F1D6BD003DE9DD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -121,6 +125,16 @@
 			path = Modals;
 			sourceTree = "<group>";
 		};
+		759D7ABB2983EB5A004DB5FE /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				759D7ABC2983EB5A004DB5FE /* FirestoreService.swift */,
+				759D7ABE2985633D004DB5FE /* AuthService.swift */,
+			);
+			name = Services;
+			path = score/Services;
+			sourceTree = SOURCE_ROOT;
+		};
 		75B4869927F1D6BD003DE9DD = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +154,7 @@
 		75B486A427F1D6BD003DE9DD /* score */ = {
 			isa = PBXGroup;
 			children = (
+				759D7ABB2983EB5A004DB5FE /* Services */,
 				75B486C827F2FE0E003DE9DD /* Views */,
 				75B486BA27F1D6DA003DE9DD /* Models */,
 				75B486B927F1D6D5003DE9DD /* Controllers */,
@@ -156,7 +171,7 @@
 		75B486B927F1D6D5003DE9DD /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				75B486CB27F31223003DE9DD /* general */,
+				75B486CB27F31223003DE9DD /* General */,
 				75B486BB27F1D709003DE9DD /* TabBarViewController.swift */,
 				75B486BD27F1D720003DE9DD /* HomeViewController.swift */,
 				75B486BF27F1D74B003DE9DD /* ProfileViewController.swift */,
@@ -185,13 +200,13 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		75B486CB27F31223003DE9DD /* general */ = {
+		75B486CB27F31223003DE9DD /* General */ = {
 			isa = PBXGroup;
 			children = (
 				7523B3BE28CB663A005FDB36 /* Modals */,
 				7523B3B728C9E90A005FDB36 /* LoginViewController.swift */,
 			);
-			name = general;
+			name = General;
 			path = "generañ";
 			sourceTree = "<group>";
 		};
@@ -281,6 +296,7 @@
 				75B486C027F1D74B003DE9DD /* ProfileViewController.swift in Sources */,
 				75B486BE27F1D720003DE9DD /* HomeViewController.swift in Sources */,
 				75B486D527F89DAC003DE9DD /* MatchModel.swift in Sources */,
+				759D7ABD2983EB5A004DB5FE /* FirestoreService.swift in Sources */,
 				75B486BC27F1D709003DE9DD /* TabBarViewController.swift in Sources */,
 				7547DAD028006D43004D7564 /* UserTableViewCell.swift in Sources */,
 				75013EA728BD243400DADC34 /* SectionHeaderUIView.swift in Sources */,
@@ -290,6 +306,7 @@
 				75B486A627F1D6BD003DE9DD /* AppDelegate.swift in Sources */,
 				7523B3B428C0C39C005FDB36 /* GameTableViewCell.swift in Sources */,
 				75B486D327F87171003DE9DD /* GameHeaderUIView.swift in Sources */,
+				759D7ABF2985633D004DB5FE /* AuthService.swift in Sources */,
 				7547DACA27F9C2AA004D7564 /* MatchTableViewCell.swift in Sources */,
 				7523B3BA28CA2597005FDB36 /* ProfileHeaderUIView.swift in Sources */,
 				75B486CD27F3124C003DE9DD /* AddGameViewController.swift in Sources */,
